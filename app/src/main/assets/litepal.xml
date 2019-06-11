@@ -1,0 +1,9 @@
+<litepal>
+    <dbname value="go_where"/>
+    <version value="1"/>
+    <list>
+        <mapping class="com.example.ryan.db.Country"/>
+        <mapping class="com.example.ryan.db.City"/>
+        <mapping class="com.example.ryan.db.Landmark"/>
+    </list>
+</litepal>
