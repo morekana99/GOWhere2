@@ -203,6 +203,7 @@ public class Choose_areaFragment extends Fragment {
             @Override
             public void onFailure(Call call, IOException e) {
                 getActivity().runOnUiThread(new Runnable() {
+                    @TargetApi(Build.VERSION_CODES.M)
                     @Override
                     public void run() {
                         closeProgressDialog();
