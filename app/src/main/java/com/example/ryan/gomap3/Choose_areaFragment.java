@@ -37,6 +37,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class Choose_areaFragment extends Fragment {
+    public static final String TAG = "PPwwwwwwwwwwwwww";
     public static final int LEVEL_COUNTRY = 0;
     public static final int LEVEL_CITY = 1;
     public static final int LEVEL_LANDMARK = 2;
@@ -78,25 +79,21 @@ public class Choose_areaFragment extends Fragment {
                 }
                 else if (currentLevel==LEVEL_CITY){
                     String cityName=cityList.get(position).getCityName();
-                    Toast.makeText(getContext(),cityName,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),cityName,Toast.LENGTH_SHORT).show();
                     if(getActivity() instanceof  LaunchActivity) {
                         Intent intent = new Intent(getActivity(), LandmarkActivity.class);
                         intent.putExtra("countrycode", cityList.get(position).getCountryId());
                         intent.putExtra("citycode", cityList.get(position).getCityCode());
+                        Log.d(TAG, cityList.get(position).getCountryId()+","+cityList.get(position).getCityCode());
                         startActivity(intent);
                         getActivity().finish();
+
                     }
                     else if(getActivity() instanceof LandmarkActivity){
-                        LandmarkActivity activity = (LandmarkActivity) getActivity();
+                        LandmarkActivity activity = (LandmarkActivity)getActivity();
                         activity.mDrawLayout.closeDrawers();
                         activity.initLandmark(cityList.get(position).getCountryId(),cityList.get(position).getCityCode());
-
                     }
-
-
-
-
-
                 }
             }
         });
@@ -105,14 +102,12 @@ public class Choose_areaFragment extends Fragment {
             public void  onClick(View v) {
                 if (currentLevel==LEVEL_CITY){
                     queryCountries();
-
                 }
-
-
             }
         });
         queryCountries();
     }
+
     private void queryCountries(){
         titilText.setText("选择国家");
         backBotton.setVisibility(View.GONE);
@@ -126,7 +121,7 @@ public class Choose_areaFragment extends Fragment {
             listview.setSelection(0);
             currentLevel = LEVEL_COUNTRY;
         }else {
-            String address = "http://uitlearn.top/api/country.json";
+            String address = "http://192.168.3.59:8080/landmark/";
             queryFromServer(address,"country");
         }
     }
@@ -144,29 +139,29 @@ public class Choose_areaFragment extends Fragment {
             currentLevel = LEVEL_CITY;
         }else{
             int countryCode= selectCountry.getCountryCode();
-            String address = "http://uitlearn.top/api/country/" + countryCode+".json";
+            String address = "http://192.168.3.59:8080/landmark/" + countryCode;
             queryFromServer(address,"city");
         }
     }
-//    private void queryLandmarks(){
-//        titilText.setText(selectCity.getCityName());
-//        backBotton.setVisibility(View.VISIBLE);
-//        landmarkList = DataSupport.where("cityid = ?",String.valueOf(selectCity.getId())).find(Landmark.class);
-//        if(landmarkList.size() > 0) {
-//            dataList.clear();
-//            for (Landmark landmark : landmarkList) {
-//                dataList.add(landmark.getLandmarkName());
-//            }
-//            adapter.notifyDataSetChanged();
-//            listview.setSelection(0);
-//            currentLevel = LEVEL_LANDMARK;
-//        }else{
-//            int countryCode = selectCountry.getCountryCode();
-//            int cityCode = selectCity.getCityCode();
-//            String address = "http://uitlearn.top/api/country/" +  countryCode+ "/" + cityCode+".json";
-//            queryFromServer(address,"landmark");
-//        }
-//    }
+    private void queryLandmarks(){
+        titilText.setText(selectCity.getCityName());
+        backBotton.setVisibility(View.VISIBLE);
+        landmarkList = DataSupport.where("cityid = ?",String.valueOf(selectCity.getId())).find(Landmark.class);
+        if(landmarkList.size() > 0) {
+            dataList.clear();
+            for (Landmark landmark : landmarkList) {
+                dataList.add(landmark.getLandmarkName());
+            }
+            adapter.notifyDataSetChanged();
+            listview.setSelection(0);
+            currentLevel = LEVEL_LANDMARK;
+        }else{
+            int countryCode = selectCountry.getCountryCode();
+            int cityCode = selectCity.getCityCode();
+            String address = "http://uitlearn.top/api/country/" +  countryCode+ "/" + cityCode+".json";
+            queryFromServer(address,"landmark");
+        }
+    }
     private void queryFromServer(String address, final String type){
         showProgressDialog();
         Log.e("Choose_areaFragment","7");

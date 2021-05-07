@@ -57,11 +57,10 @@ public class Landmark_DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent navi = new Intent(Landmark_DetailActivity.this,WebActivity.class);
-                String url= "http://api.map.baidu.com/geocoder?address=" +cityName +landmarkName
-                                + "&output=html&src=webapp.martin.gowhere";
+                String url= "http://uri.amap.com/search?keyword=" +landmarkName
+                        + "&view=map&src=gowhere&coordinate=gaode&callnative=0";
                 navi.putExtra("landmark_url",url);
                 startActivity(navi);
-
             }
         });
     }
@@ -84,6 +83,9 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         else if(landmarkName.equals("童牛岭")) {
             return this.getString(R.string.童牛岭);
         }
+        else if(landmarkName.equals("布鲁克林大桥")) {
+            return this.getString(R.string.童牛岭);
+        }
         else {
             return "     未能获取到信息...";
         }
@@ -98,5 +100,7 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
 }

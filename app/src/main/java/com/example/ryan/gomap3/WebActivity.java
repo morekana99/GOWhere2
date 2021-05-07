@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.GeolocationPermissions;
 import android.webkit.WebChromeClient;
@@ -22,25 +24,16 @@ import java.util.Random;
 
 public class WebActivity extends AppCompatActivity {
 
+    WebView webView = null;
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
 
-        Button button = (Button)  findViewById(R.id.cost_botton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Random costrandom = new Random();
-                String cost = "该公交线路消费约"+(int)(costrandom.nextDouble() * 0.5 + 1)*10+"元";
-                Toast.makeText(WebActivity.this,cost,Toast.LENGTH_SHORT).show();
 
-            }
-
-        });
-
-        WebView webView = (WebView)findViewById(R.id.web_view);
+        webView = (WebView)findViewById(R.id.web_view);
         WebSettings webSettings = webView.getSettings();
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setLoadsImagesAutomatically(true);
@@ -62,11 +55,13 @@ public class WebActivity extends AppCompatActivity {
         //开启DomStorage缓存
         webSettings.setDomStorageEnabled(true);
         webView.setWebViewClient(new WebViewClient());
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setAllowFileAccess(true);
 
 
         Intent intent = getIntent();
         String uristr =intent.getStringExtra("landmark_url");
-
+        Log.d("dd", uristr);
         webView.loadUrl(uristr);
 
 
@@ -97,5 +92,20 @@ public class WebActivity extends AppCompatActivity {
 
 
 
+
+
+
     }
+    //点击返回键，返回上一个页面，而不是退出程序
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
+            webView.goBack();
+            // 返回前一个页面
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+
 }

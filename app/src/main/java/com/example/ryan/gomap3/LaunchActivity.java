@@ -32,7 +32,9 @@ public class LaunchActivity extends AppCompatActivity {
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED){
             //申请一个（或多个）权限，并提供用于回调返回的获取码（用户定义）
             ActivityCompat.requestPermissions(LaunchActivity.this, new String[]{
                     Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -42,7 +44,7 @@ public class LaunchActivity extends AppCompatActivity {
                     Manifest.permission.ACCESS_NETWORK_STATE,
                     Manifest.permission.ACCESS_WIFI_STATE,
                     Manifest.permission.READ_PHONE_STATE,
-                    Manifest.permission.CAMERA
+                    Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO
             }, 100);
         }
         SharedPreferences prfs = PreferenceManager.getDefaultSharedPreferences(this);

@@ -1,6 +1,7 @@
 package com.example.ryan.utill;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.example.ryan.db.City;
 import com.example.ryan.db.Country;
@@ -19,8 +20,9 @@ public class  Utility {
                 for (int i=0;i<allCountries.length();i++){
                     JSONObject countryObject = allCountries.getJSONObject(i);
                     Country country = new Country();
-                    country.setCountryCode(countryObject.getInt("id"));
-                    country.setCountyName(countryObject.getString("name"));
+                    country.setCountryCode(countryObject.getInt("countryId"));
+                    country.setCountyName(countryObject.getString("countryName"));
+                    Log.e("wwwwwwwwwwwwwwwww",countryObject.getInt("countryId")+countryObject.getString("countryName"));
                     country.save();
                 }
                 return true;
@@ -37,8 +39,8 @@ public class  Utility {
                 for (int i=0;i<allCities.length();i++){
                     JSONObject cityJSONObject= allCities.getJSONObject(i);
                     City city = new City();
-                    city.setCityCode(cityJSONObject.getInt("id"));
-                    city.setCityName(cityJSONObject.getString("name"));
+                    city.setCityCode(cityJSONObject.getInt("cityId"));
+                    city.setCityName(cityJSONObject.getString("cityName"));
                     city.setCountryId(countryId);
                     city.save();
                 }

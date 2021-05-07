@@ -20,7 +20,7 @@ import java.util.List;
 public class LandmarkAdapter extends RecyclerView.Adapter<LandmarkAdapter.ViewHolder> {
     private Context mContext;
     private List<Landmarkdata> mLandmarkList;
-    static  class ViewHolder extends RecyclerView.ViewHolder{
+    static  class ViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         ImageView landmarkimage;
         TextView landmarkname;

@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
@@ -20,6 +21,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.ActionBar;
@@ -89,8 +92,15 @@ public class LandmarkActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landmark);
-        Intent intent = getIntent();
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window window = getWindow();
+            window.setFlags(
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+
+        Intent intent = getIntent();
         country = intent.getIntExtra("countrycode",0);
         city = intent.getIntExtra("citycode",0);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -128,7 +138,7 @@ public class LandmarkActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.more:
                 Intent mylocation = new Intent(LandmarkActivity.this,WebActivity.class);
-                String url= "http://api.map.baidu.com/geocoder?address=大连&output=html&src=webapp.martin.gowhere";
+                String url= "http://api.map.baidu.com/geocoder?address=兰州&output=html&src=webapp.martin.gowhere";
                 mylocation.putExtra("landmark_url",url);
                 startActivity(mylocation);
                 break;
@@ -147,14 +157,14 @@ public class LandmarkActivity extends AppCompatActivity {
 
     public void initLandmark(int countryCode,int cityCode) {
         dataList.clear();
-        if (countryCode == 1 && cityCode == 7) {
+        /*if (countryCode == 1 && cityCode ==2) {
             getSupportActionBar().setTitle("大连");
             for (int i = 0; i < 50; i++) {
 
                 int index = i%15;
                 dataList.add(dalianList[index]);
             }
-        } else if (countryCode == 2 && cityCode == 1) {
+        } else if (countryCode == 3&& cityCode == 1) {
             getSupportActionBar().setTitle("纽约");
             for (int i = 0; i < 50; i++) {
 
@@ -162,7 +172,7 @@ public class LandmarkActivity extends AppCompatActivity {
                 dataList.add(newyorkList[index]);
             }
 
-        } else if (countryCode == 3 && cityCode == 1) {
+        } else if (countryCode ==2 && cityCode == 1) {
             getSupportActionBar().setTitle("东京");
             for (int i = 0; i < 50; i++) {
 
@@ -170,7 +180,7 @@ public class LandmarkActivity extends AppCompatActivity {
                 dataList.add(tokyoList[index]);
             }
 
-        }
+        }*/
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);

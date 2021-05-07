@@ -7,17 +7,11 @@
     android:fitsSystemWindows="true">
     <WebView
         android:id="@+id/web_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_x="0.0dip"
+        android:layout_y="0.0dip"
+        android:layout_weight="1.0">
     </WebView>
-
-    <Button
-        android:id="@+id/cost_botton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="0dp"
-        android:background="#00000000"/>
 
 </RelativeLayout>
