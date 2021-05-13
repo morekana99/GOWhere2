@@ -5,8 +5,11 @@ import org.litepal.crud.DataSupport;
 public class Landmark extends DataSupport {
     private int id;
     private String landmarkName;
+    private String cityName;
     private int cityId;
     private int imageId;
+    private String describe;
+
     public Landmark(){
     };
     public Landmark(String landmarkName, int imageId){
@@ -43,5 +46,21 @@ public class Landmark extends DataSupport {
 
     public void setLandmarkName(String landmarkName) {
         this.landmarkName = landmarkName;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public String getDescribe() {
+        return describe;
+    }
+
+    public void setDescribe(String describe) {
+        this.describe = describe;
     }
 }

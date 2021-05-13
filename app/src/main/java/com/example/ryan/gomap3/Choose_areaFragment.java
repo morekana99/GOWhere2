@@ -37,7 +37,6 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class Choose_areaFragment extends Fragment {
-    public static final String TAG = "PPwwwwwwwwwwwwww";
     public static final int LEVEL_COUNTRY = 0;
     public static final int LEVEL_CITY = 1;
     public static final int LEVEL_LANDMARK = 2;
@@ -84,7 +83,6 @@ public class Choose_areaFragment extends Fragment {
                         Intent intent = new Intent(getActivity(), LandmarkActivity.class);
                         intent.putExtra("countrycode", cityList.get(position).getCountryId());
                         intent.putExtra("citycode", cityList.get(position).getCityCode());
-                        Log.d(TAG, cityList.get(position).getCountryId()+","+cityList.get(position).getCityCode());
                         startActivity(intent);
                         getActivity().finish();
 
@@ -92,7 +90,7 @@ public class Choose_areaFragment extends Fragment {
                     else if(getActivity() instanceof LandmarkActivity){
                         LandmarkActivity activity = (LandmarkActivity)getActivity();
                         activity.mDrawLayout.closeDrawers();
-                        activity.initLandmark(cityList.get(position).getCountryId(),cityList.get(position).getCityCode());
+                        activity.initLandmarkList(cityList.get(position).getCountryId(),cityList.get(position).getCityCode());
                     }
                 }
             }
@@ -158,7 +156,7 @@ public class Choose_areaFragment extends Fragment {
         }else{
             int countryCode = selectCountry.getCountryCode();
             int cityCode = selectCity.getCityCode();
-            String address = "http://uitlearn.top/api/country/" +  countryCode+ "/" + cityCode+".json";
+            String address = "http://192.168.3.59:8080/landmark/" +  countryCode+ "/" + cityCode;
             queryFromServer(address,"landmark");
         }
     }

@@ -1,6 +1,7 @@
 package com.example.ryan.gomap3;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -8,9 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-
-
+import android.util.Log;
 
 
 public class LaunchActivity extends AppCompatActivity {
@@ -47,9 +46,11 @@ public class LaunchActivity extends AppCompatActivity {
                     Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO
             }, 100);
         }
-        SharedPreferences prfs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prfs.getString("cityname", null) != null) {
-            Intent intent = new Intent(this, WebActivity.class);
+        SharedPreferences prfs = LaunchActivity.this.getSharedPreferences("gowhere", Context.MODE_PRIVATE);
+        if (prfs.getInt("citycode", 0) != 0) {
+            Intent intent = new Intent(this, LandmarkActivity.class);
+            intent.putExtra("countrycode", prfs.getInt("countrycode", 0));
+            intent.putExtra("citycode", prfs.getInt("citycode", 0));
             startActivity(intent);
             finish();
         }

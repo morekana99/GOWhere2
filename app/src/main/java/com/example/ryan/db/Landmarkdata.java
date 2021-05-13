@@ -13,21 +13,35 @@ public class Landmarkdata {
         this.describe = describe;
     }
 
-
-    public int getImageId(){
-        return imageId;
-    }
-
     public String getLandmarkName() {
         return landmarkName;
     }
 
+    public void setLandmarkName(String landmarkName) {
+        this.landmarkName = landmarkName;
+    }
 
-    public String getCityName(){
+    public int getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(int imageId) {
+        this.imageId = imageId;
+    }
+
+    public String getCityName() {
         return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
     }
 
     public String getDescribe() {
         return describe;
+    }
+
+    public void setDescribe(String describe) {
+        this.describe = describe;
     }
 }

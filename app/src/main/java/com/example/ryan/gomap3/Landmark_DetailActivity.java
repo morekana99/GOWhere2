@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -49,7 +50,7 @@ public class Landmark_DetailActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         collapsingToolbarLayout.setTitle(landmarkName);
-        Glide.with(this).load(landmarkImageid).into(landmarkImageView);
+        Glide.with(this).load("http://uitlearn.top/images/p"+landmarkImageid+".jpg").into(landmarkImageView);
         final String landmarkContent = generateLandmarkContent(landmarkName);
         Toast.makeText(this,landmarkName,Toast.LENGTH_SHORT).show();
         landmarkContext.setText(landmarkContent);

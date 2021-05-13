@@ -3,12 +3,16 @@ package com.example.ryan.gomap3;
 
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,6 +21,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,7 +42,10 @@ import com.example.ryan.utill.HttpUtill;
 import com.example.ryan.utill.Utility;
 
 
+import org.litepal.crud.DataSupport;
+
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -54,25 +62,8 @@ public class LandmarkActivity extends AppCompatActivity {
     private int country;
     private int city;
     private ProgressDialog progressDialog;
-    private Landmarkdata[] dalianList={new Landmarkdata("大连理工大学",R.drawable.p1,"大连")
-            ,new Landmarkdata("星海广场",R.drawable.p2,"大连"),new Landmarkdata("大连森林动物园",R.drawable.p3,"大连"),
-            new Landmarkdata("老虎滩风景区",R.drawable.p4,"大连"),new Landmarkdata("金石滩风景区",R.drawable.p5,"大连"),
-            new Landmarkdata("童牛岭",R.drawable.p35,"大连"), new Landmarkdata("东港音乐喷泉",R.drawable.p6,"大连"),
-            new Landmarkdata("旅顺日俄监狱",R.drawable.p7,"大连"), new Landmarkdata("星海大桥",R.drawable.p8,"大连"),
-            new Landmarkdata("渔人码头",R.drawable.p25,"大连"), new Landmarkdata("发现王国",R.drawable.p26,"大连"),
-            new Landmarkdata("圣亚海洋公园",R.drawable.p27,"大连"), new Landmarkdata("旅顺军港",R.drawable.p28,"大连"),
-            new Landmarkdata("旅顺口",R.drawable.p29,"大连"), new Landmarkdata("滨海路",R.drawable.p30,"大连")};
-    private  Landmarkdata[] newyorkList={new Landmarkdata("自由女神像",R.drawable.p9,"纽约"),
-            new Landmarkdata("时代广场",R.drawable.p10,"纽约"),new Landmarkdata("帝国大厦",R.drawable.p11,"纽约"),
-            new Landmarkdata("纽约博物馆",R.drawable.p12,"纽约"),new Landmarkdata("布鲁克林大桥",R.drawable.p13,"纽约"),
-            new Landmarkdata("百老汇大道",R.drawable.p14,"纽约"),new Landmarkdata("第五大道",R.drawable.p15,"纽约"),
-            new Landmarkdata("洛克菲勒中心",R.drawable.p16,"纽约"),new Landmarkdata("中央公园",R.drawable.p31,"纽约"),
-            new Landmarkdata("复仇者大厦",R.drawable.p32,"纽约")};
-    private Landmarkdata[] tokyoList={new Landmarkdata("银座",R.drawable.p33,"东京"),new Landmarkdata("富士山",R.drawable.p18,"东京"),
-            new Landmarkdata("天空树",R.drawable.p19,"东京"),new Landmarkdata("东京塔",R.drawable.p20,"东京"),
-            new Landmarkdata("上野公园",R.drawable.p21,"东京"),new Landmarkdata("涩谷",R.drawable.p22,"东京"),
-            new Landmarkdata("东京竞马场",R.drawable.p23,"东京"),new Landmarkdata("印刷博物馆",R.drawable.p24,"东京"),
-            new Landmarkdata("秋叶原",R.drawable.p17,"东京"),new Landmarkdata("迪士尼乐园",R.drawable.p34,"东京")};
+    RecyclerView recyclerView ;
+    GridLayoutManager layoutManager ;
 
     private static boolean isExit = false;
 
@@ -83,6 +74,7 @@ public class LandmarkActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             isExit = false;
+
         }
     };
 
@@ -91,14 +83,15 @@ public class LandmarkActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_landmark);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             Window window = getWindow();
             window.setFlags(
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
+        setContentView(R.layout.activity_landmark);
+
+
 
         Intent intent = getIntent();
         country = intent.getIntExtra("countrycode",0);
@@ -121,11 +114,19 @@ public class LandmarkActivity extends AppCompatActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_name);
 
         }
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        layoutManager = new GridLayoutManager(this, 2);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new LandmarkAdapter(dataList);
+        recyclerView.setAdapter(adapter);
 
+        SharedPreferences sp=LandmarkActivity.this.getSharedPreferences("gowhere", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt("citycode", city);
+        editor.putInt("countrycode", country);
+        editor.apply();
 
-
-
-        initLandmark(country,city);
+        queryLandmarks();
 
 
     }
@@ -133,6 +134,7 @@ public class LandmarkActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.toolbar,menu);
         return true;
     }
+    @SuppressLint("NonConstantResourceId")
     @Override
     public  boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
@@ -151,13 +153,21 @@ public class LandmarkActivity extends AppCompatActivity {
         return true;
     }
 
+    public  void initLandmarkList(int countryCode,int cityCode){
+        country = countryCode;
+        city = cityCode;
+        queryLandmarks();
+    }
 
 
 
 
-    public void initLandmark(int countryCode,int cityCode) {
+
+
+    /*public void initLandmark(int countryCode,int cityCode) {
         dataList.clear();
-        /*if (countryCode == 1 && cityCode ==2) {
+
+        if (countryCode == 1 && cityCode ==2) {
             getSupportActionBar().setTitle("大连");
             for (int i = 0; i < 50; i++) {
 
@@ -180,13 +190,10 @@ public class LandmarkActivity extends AppCompatActivity {
                 dataList.add(tokyoList[index]);
             }
 
-        }*/
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new LandmarkAdapter(dataList);
-        recyclerView.setAdapter(adapter);
-    }
+        }
+
+
+    }*/
 
 
 
@@ -235,6 +242,54 @@ public class LandmarkActivity extends AppCompatActivity {
             finish();
             System.exit(0);
         }
+    }
+    private void queryLandmarks(){
+        landmarkList = DataSupport.where("cityid = ?",String.valueOf(city)).find(Landmark.class);
+        if(landmarkList.size() > 0) {
+            dataList.clear();
+            for (Landmark landmark : landmarkList) {
+                dataList.add(new Landmarkdata(landmark.getLandmarkName(),landmark.getImageId(),landmark.getCityName()));
+            }
+
+            adapter.notifyDataSetChanged();
+        }else{
+            String address = "http://192.168.3.59:8080/landmark/" +  country+ "/" + city;
+            queryFromServer(address);
+        }
+    }
+    private void queryFromServer(String address){
+        showProgressDialog();
+        HttpUtill.sendOkHttpRequest(address, new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseText = response.body().string();
+                boolean result = false;
+                Log.d("WWWWWWWwwwwwwwwww", responseText);
+                result = Utility.handleLandmarkResponse(responseText,city);
+
+                if (result){
+                    LandmarkActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            closeProgressDialog();
+                            queryLandmarks();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                LandmarkActivity.this.runOnUiThread(new Runnable() {
+                    @TargetApi(Build.VERSION_CODES.M)
+                    @Override
+                    public void run() {
+                        closeProgressDialog();
+                        Toast.makeText(LandmarkActivity.this,"无网络连接，请检查网络",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
 }

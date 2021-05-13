@@ -65,7 +65,7 @@ public class LandmarkAdapter extends RecyclerView.Adapter<LandmarkAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder,int position) {
         Landmarkdata landmark = mLandmarkList.get(position);
         holder.landmarkname.setText(landmark.getLandmarkName());
-        Glide.with(mContext).load(landmark.getImageId()).into(holder.landmarkimage);
+        Glide.with(mContext).load("http://uitlearn.top/images/p"+landmark.getImageId()+".jpg").into(holder.landmarkimage);
     }
     @Override
     public int getItemCount(){

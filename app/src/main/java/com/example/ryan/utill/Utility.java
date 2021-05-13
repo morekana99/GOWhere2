@@ -22,7 +22,6 @@ public class  Utility {
                     Country country = new Country();
                     country.setCountryCode(countryObject.getInt("countryId"));
                     country.setCountyName(countryObject.getString("countryName"));
-                    Log.e("wwwwwwwwwwwwwwwww",countryObject.getInt("countryId")+countryObject.getString("countryName"));
                     country.save();
                 }
                 return true;
@@ -60,7 +59,8 @@ public class  Utility {
                     Landmark landmark = new Landmark();
                     landmark.setLandmarkName(landmarksJSONObject.getString("name"));
                     landmark.setCityId(cityId);
-                    landmark.setImageId(landmarksJSONObject.getInt("imageid"));
+                    landmark.setImageId(landmarksJSONObject.getInt("imageId"));
+                    landmark.setCityName(landmarksJSONObject.getString("cityName"));
                     landmark.save();
                 }
                 return true;
