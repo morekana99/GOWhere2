@@ -2,10 +2,8 @@ package com.example.ryan.gomap3;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,7 +19,6 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,12 +27,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.ryan.utill.BorderTextView;
 import com.example.ryan.utill.ImageUtils;
-import com.melnykov.fab.FloatingActionButton;
-import com.tiancaicc.springfloatingactionmenu.MenuItemView;
-import com.tiancaicc.springfloatingactionmenu.OnMenuActionListener;
-import com.tiancaicc.springfloatingactionmenu.SpringFloatingActionMenu;
+import com.example.ryan.utill.SwListDialog;
+
 import com.youdao.sdk.app.EncryptHelper;
 import com.youdao.sdk.app.Language;
+import com.youdao.sdk.app.LanguageUtils;
 import com.youdao.sdk.ydonlinetranslate.OCRTranslateResult;
 import com.youdao.sdk.ydonlinetranslate.OcrTranslate;
 import com.youdao.sdk.ydonlinetranslate.OcrTranslateListener;
@@ -46,6 +42,8 @@ import com.youdao.sdk.ydtranslate.TranslateErrorCode;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -55,23 +53,44 @@ import java.util.List;
 
 public class OcrTranslateActivity extends Activity {
 
+    private String[] lang = new String[]{"中文", "日文", "英文", };
 
-    TextView original;
-    Uri currentUri;
-    String filePath;
-    ImageView imageView;
-    ImageView resultImage;
-    BorderTextView borderTextView;
-    Handler handler = new Handler();
+    private TextView original;
+    private Uri currentUri;
+    private String filePath;
+    private ImageView imageView;
+    private ImageView resultImage;
+    private BorderTextView borderTextView;
+    private Handler handler = new Handler();
+
+    private TextView languageSelectFrom;
+    private TextView languageSelectTo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ocr_demo);
+        setContentView(R.layout.ocr_layout);
+        languageSelectFrom = (TextView) findViewById(R.id.languageSelectFrom);
+        languageSelectFrom.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                selectLanguage(languageSelectFrom);
+            }
+        });
+        languageSelectTo = (TextView) findViewById(R.id.languageSelectTo);
+        languageSelectTo.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                selectLanguage(languageSelectTo);
+            }
+        });
         imageView = (ImageView) findViewById(R.id.imageView);
         resultImage = (ImageView)findViewById(R.id.resultImageView);
         original = (TextView) findViewById(R.id.original);
         borderTextView = (BorderTextView) findViewById(R.id.resultText);
+
     }
 
     OcrTranslateListener translateListener = new OcrTranslateListener() {
@@ -190,7 +209,9 @@ public class OcrTranslateActivity extends Activity {
     }
 
     public void startTranslate(final String base64) {
-        OcrTranslateParameters ocrP = new OcrTranslateParameters.Builder().timeout(6000).from(Language.CZECH).to(Language.CHINESE).serverRender(true).build(); //zh-en
+        String langFrom = languageSelectFrom.getText().toString();
+        String langTo = languageSelectTo.getText().toString();
+        OcrTranslateParameters ocrP = new OcrTranslateParameters.Builder().timeout(6000).from(Language.getLanguageByName(langFrom)).to(Language.getLanguageByName(langTo)).serverRender(true).build(); //zh-en
         OcrTranslate.getInstance(ocrP).lookup(base64, "requestid", translateListener);
         Toast.makeText(OcrTranslateActivity.this, "开始识别，请稍等~~~", Toast.LENGTH_LONG).show();
     }
@@ -233,5 +254,19 @@ public class OcrTranslateActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    private void selectLanguage(final TextView languageSelect) {
+        final String[] str = lang;
+        List<String> items = new ArrayList<String>(Arrays.asList(str));
 
+        SwListDialog exitDialog = new SwListDialog(OcrTranslateActivity.this,
+                items);
+        exitDialog.setItemListener(new SwListDialog.ItemListener() {
+
+            @Override
+            public void click(int position, String title) {
+                languageSelect.setText(title);
+            }
+        });
+        exitDialog.show();
+    }
 }

@@ -4,50 +4,119 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <ScrollView
-        android:id="@+id/result_lo"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:id="@+id/titleBar"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:background="#fff" >
+
+            <ImageView
+                android:id="@+id/login_reback_btn"
+                android:layout_width="28dp"
+                android:layout_height="24dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="9dp"
+                android:clickable="true"
+                android:onClick="loginBack"
+                android:src="@drawable/ic_back3" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal"
+                >
+
+                <TextView
+                    android:id="@+id/languageSelectFrom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:gravity="center_vertical|right"
+                    android:text="英文"
+                    android:textColor="#808080"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:gravity="center_vertical|right"
+                    android:text=">"
+                    android:textColor="#808080"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/languageSelectTo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:gravity="center_vertical|right"
+                    android:text="中文"
+                    android:textColor="#808080"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <include
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
+                layout="@layout/item_divider" />
+        </RelativeLayout>
+        <ScrollView
+            android:id="@+id/result_lo"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="parent">
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#00ffff"
-                android:scaleType="fitXY" />
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="parent">
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#00ffff"
+                    android:scaleType="fitXY" />
 
-            <TextView
-                android:id="@+id/original"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:textSize="16dp" />
-            <ImageView
-                android:id="@+id/resultImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#00ffff"
-                android:scaleType="fitXY" />
+                <TextView
+                    android:id="@+id/original"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:textSize="16dp" />
+                <ImageView
+                    android:id="@+id/resultImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#00ffff"
+                    android:scaleType="fitXY" />
 
-            <com.example.ryan.utill.BorderTextView
-                android:id="@+id/resultText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:lineSpacingMultiplier="1.5"
-                android:padding="10dp"
-                android:text=""
-                android:textColor="#000000"
-                android:textSize="16sp"
-                android:visibility="invisible" />
-        </LinearLayout>
-    </ScrollView>
+                <com.example.ryan.utill.BorderTextView
+                    android:id="@+id/resultText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:lineSpacingMultiplier="1.5"
+                    android:padding="10dp"
+                    android:text=""
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:visibility="invisible" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -60,11 +129,12 @@
             android:id="@+id/fbtn_take_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/fbtn_start_trans"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/translate"
+            android:onClick="takePhoto" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fbtn_start_trans"
@@ -73,7 +143,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@id/fbtn_take_photo"
             app:layout_constraintRight_toLeftOf="@id/fbtn_choose_pic"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/image_trans_pic"
+            android:onClick="recognize" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fbtn_choose_pic"
@@ -82,7 +154,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@id/fbtn_start_trans"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/choose_image"
+            android:onClick="getImage" />
     </android.support.constraint.ConstraintLayout>
 
 

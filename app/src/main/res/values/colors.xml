@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#1f6deb</color>
     <color name="colorPrimaryDark">#1f6deb</color>
-    <color name="colorAccent">#ff9913</color>
+    <color name="colorAccent">#ff4e49</color>
     <color name="theme">#1994d0</color>
     <color name="chat">#559fca</color>
     <color name="quote">#f0983c</color>
@@ -11,6 +11,11 @@
     <color name="photo">#d75f45</color>
     <color name="text">#444444</color>
     <color name="video">#748089</color>
+
     <color name="fab">#529ecc</color>
+
     <color name="text_color">#949ca8</color>
+
+    <color name="bg_item">#fff</color>
+    <color name="bg_item_press">#f0f0f0</color>
 </resources>
