@@ -6,7 +6,9 @@ public class Landmarkdata {
     private int imageId;
     private String cityName;
     private String describe;
-    public Landmarkdata(String landmarkName, int imageId,String cityName){
+    private int countyId;
+    public Landmarkdata(int countyId,String landmarkName, int imageId,String cityName){
+        this.countyId = countyId;
         this.landmarkName = landmarkName;
         this.imageId = imageId;
         this.cityName = cityName;
@@ -43,5 +45,13 @@ public class Landmarkdata {
 
     public void setDescribe(String describe) {
         this.describe = describe;
+    }
+
+    public int getCountyId() {
+        return countyId;
+    }
+
+    public void setCountyId(int countyId) {
+        this.countyId = countyId;
     }
 }

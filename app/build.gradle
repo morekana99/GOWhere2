@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
 
-
+    sourceSets.main.jniLibs.srcDirs = ['libs']
     defaultConfig {
         applicationId "com.example.ryan.gomap3"
         minSdkVersion 15
@@ -36,9 +36,7 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    //  androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2'
     implementation files('libs/AMap3DMap_6.4.0_AMapNavi_6.2.0_AMapSearch_6.1.0_AMapLocation_4.2.0_20180814.jar')
-    // compile 'com.android.support:design:25.3.1'
     implementation 'org.litepal.android:core:1.5.0'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.google.code.gson:gson:2.8.2'
@@ -46,6 +44,9 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.android.support:cardview-v7:28.0.0'
     implementation(name: 'trans-ocr-sdk_v1.0.1', ext: 'aar')
+    implementation files('libs/YoudaoBase_v2.0.4.jar')
+    implementation files('libs/YoudaoTranslateOnline_v2.0.2.jar')
+    implementation 'com.tiancaicc.springfloatingactionmenu:library:0.0.2'
 
 
 }

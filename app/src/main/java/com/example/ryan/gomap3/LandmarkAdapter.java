@@ -52,6 +52,7 @@ public class LandmarkAdapter extends RecyclerView.Adapter<LandmarkAdapter.ViewHo
                 position = holder.getAdapterPosition();
                 Landmarkdata landmark = mLandmarkList.get(position);
                 Intent intent = new Intent(mContext,Landmark_DetailActivity.class);
+                intent.putExtra(Landmark_DetailActivity.LANDMARK_COUNTRY_ID,landmark.getCountyId());
                 intent.putExtra(Landmark_DetailActivity.LANDMARK_NAME,landmark.getLandmarkName());
                 intent.putExtra(Landmark_DetailActivity.LANDMARK_IMAGE_ID,landmark.getImageId());
                 intent.putExtra(Landmark_DetailActivity.LANDMARK_CITY_NAME,landmark.getCityName());

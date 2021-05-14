@@ -26,7 +26,9 @@ import com.bumptech.glide.Glide;
 public class Landmark_DetailActivity extends AppCompatActivity {
     public static final String LANDMARK_NAME = "Landmark_name";
     public  static final String LANDMARK_IMAGE_ID = "landmark_image_id";
-    public  static final String LANDMARK_CITY_NAME = "landmark_cityname";
+    public  static final String LANDMARK_CITY_NAME = "landmark_city_name";
+    public  static final String LANDMARK_COUNTRY_ID = "landmark_country_id";
+    private String url;
 
 
     @Override
@@ -37,6 +39,7 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         final String landmarkName = intent.getStringExtra(LANDMARK_NAME);
         final String cityName = intent.getStringExtra(LANDMARK_CITY_NAME);
         int landmarkImageid = intent.getIntExtra(LANDMARK_IMAGE_ID,0);
+        final int countryCode = intent.getIntExtra(LANDMARK_COUNTRY_ID,0);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.navgation);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -58,8 +61,14 @@ public class Landmark_DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent navi = new Intent(Landmark_DetailActivity.this,WebActivity.class);
-                String url= "http://uri.amap.com/search?keyword=" +landmarkName
-                        + "&view=map&src=gowhere&coordinate=gaode&callnative=0";
+                if (countryCode!=1){
+                    url= " https://www.google.com/maps/search/?api=1&query="+landmarkName+"&hl=zh-cn";
+
+                }else{
+                    url= "http://uri.amap.com/search?keyword=" +landmarkName
+                            + "&view=map&src=gowhere&coordinate=gaode&callnative=0";
+                }
+
                 navi.putExtra("landmark_url",url);
                 startActivity(navi);
             }

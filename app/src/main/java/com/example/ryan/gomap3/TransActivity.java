@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -101,7 +102,7 @@ public class TransActivity extends AppCompatActivity {
 
 
                         OcrClient client = OcrClientFactory.create(TransActivity.this,
-                                        "20190325000281031","KphRdTtQ7cnXCLIgNcE1");
+                                        "20210428000806058","EeT716HJ6txHFTz5Yiz_");
                         client.getOcrResult(Language.JP, Language.ZH, bitmap, new OcrCallback() {
                             @Override
                             public void onOcrResult(OcrResult ocrResult) {
@@ -130,7 +131,7 @@ public class TransActivity extends AppCompatActivity {
 
 
                         OcrClient client = OcrClientFactory.create(TransActivity.this,
-                                "20190325000281031","KphRdTtQ7cnXCLIgNcE1");
+                                "20210428000806058","EeT716HJ6txHFTz5Yiz_ ");
                         client.getOcrResult(Language.EN, Language.ZH, bitmap, new OcrCallback() {
                             @Override
                             public void onOcrResult(OcrResult ocrResult) {
@@ -139,6 +140,7 @@ public class TransActivity extends AppCompatActivity {
                                 }
                                 transResult=toContentsString(ocrResult.getContents());
                                 textView.setText(transResult);
+                                Log.d("qqqqqqqqqqq", ocrResult.getError()+"");
 
                                 progressBar.setVisibility(View.GONE);
                             }

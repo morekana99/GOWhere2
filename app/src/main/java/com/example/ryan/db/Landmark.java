@@ -6,6 +6,7 @@ public class Landmark extends DataSupport {
     private int id;
     private String landmarkName;
     private String cityName;
+    private int countryId;
     private int cityId;
     private int imageId;
     private String describe;
@@ -38,6 +39,14 @@ public class Landmark extends DataSupport {
 
     public void setCityId(int cityId) {
         this.cityId = cityId;
+    }
+
+    public int getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(int countryId) {
+        this.countryId = countryId;
     }
 
     public String getLandmarkName() {

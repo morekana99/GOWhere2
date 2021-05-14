@@ -59,6 +59,7 @@ public class  Utility {
                     Landmark landmark = new Landmark();
                     landmark.setLandmarkName(landmarksJSONObject.getString("name"));
                     landmark.setCityId(cityId);
+                    landmark.setCountryId(landmarksJSONObject.getInt("countryId"));
                     landmark.setImageId(landmarksJSONObject.getInt("imageId"));
                     landmark.setCityName(landmarksJSONObject.getString("cityName"));
                     landmark.save();

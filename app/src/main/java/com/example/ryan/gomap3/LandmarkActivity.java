@@ -103,7 +103,7 @@ public class LandmarkActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentChooseLanguage= new Intent(LandmarkActivity.this,Choose_LanguageActivity.class);
+                Intent intentChooseLanguage= new Intent(LandmarkActivity.this,OcrTranslateActivity.class);
                 startActivity(intentChooseLanguage);
 
             }
@@ -140,7 +140,7 @@ public class LandmarkActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.more:
                 Intent mylocation = new Intent(LandmarkActivity.this,WebActivity.class);
-                String url= "http://api.map.baidu.com/geocoder?address=兰州&output=html&src=webapp.martin.gowhere";
+                String url= "http://api.map.baidu.com/geocoder?address=&output=html&src=webapp.martin.gowhere";
                 mylocation.putExtra("landmark_url",url);
                 startActivity(mylocation);
                 break;
@@ -248,7 +248,7 @@ public class LandmarkActivity extends AppCompatActivity {
         if(landmarkList.size() > 0) {
             dataList.clear();
             for (Landmark landmark : landmarkList) {
-                dataList.add(new Landmarkdata(landmark.getLandmarkName(),landmark.getImageId(),landmark.getCityName()));
+                dataList.add(new Landmarkdata(country,landmark.getLandmarkName(),landmark.getImageId(),landmark.getCityName()));
             }
 
             adapter.notifyDataSetChanged();
@@ -264,7 +264,6 @@ public class LandmarkActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 String responseText = response.body().string();
                 boolean result = false;
-                Log.d("WWWWWWWwwwwwwwwww", responseText);
                 result = Utility.handleLandmarkResponse(responseText,city);
 
                 if (result){
