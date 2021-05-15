@@ -119,7 +119,7 @@ public class Choose_areaFragment extends Fragment {
             listview.setSelection(0);
             currentLevel = LEVEL_COUNTRY;
         }else {
-            String address = "http://192.168.3.59:8080/landmark/";
+            String address = "http://"+HttpUtill.oneIP+":8080/landmark/";
             queryFromServer(address,"country");
         }
     }
@@ -137,7 +137,7 @@ public class Choose_areaFragment extends Fragment {
             currentLevel = LEVEL_CITY;
         }else{
             int countryCode= selectCountry.getCountryCode();
-            String address = "http://192.168.3.59:8080/landmark/" + countryCode;
+            String address = "http://"+HttpUtill.oneIP+":8080/landmark/" + countryCode;
             queryFromServer(address,"city");
         }
     }
@@ -156,7 +156,7 @@ public class Choose_areaFragment extends Fragment {
         }else{
             int countryCode = selectCountry.getCountryCode();
             int cityCode = selectCity.getCityCode();
-            String address = "http://192.168.3.59:8080/landmark/" +  countryCode+ "/" + cityCode;
+            String address = "http://"+HttpUtill.oneIP+"8080/landmark/" +  countryCode+ "/" + cityCode;
             queryFromServer(address,"landmark");
         }
     }

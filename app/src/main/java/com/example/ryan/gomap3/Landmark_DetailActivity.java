@@ -2,6 +2,8 @@ package com.example.ryan.gomap3;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Build;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
@@ -34,6 +36,11 @@ public class Landmark_DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= 21) {
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
         setContentView(R.layout.activity_landmark_detail);
         final Intent intent = getIntent();
         final String landmarkName = intent.getStringExtra(LANDMARK_NAME);
@@ -62,7 +69,7 @@ public class Landmark_DetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent navi = new Intent(Landmark_DetailActivity.this,WebActivity.class);
                 if (countryCode!=1){
-                    url= " https://www.google.com/maps/search/?api=1&query="+landmarkName+"&hl=zh-cn";
+                    url= " https://www.google.com/maps/search/?api=1&query="+cityName+landmarkName+"&hl=zh-cn";
 
                 }else{
                     url= "http://uri.amap.com/search?keyword=" +landmarkName

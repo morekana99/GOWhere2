@@ -46,7 +46,7 @@ public class LaunchActivity extends AppCompatActivity {
                     Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO
             }, 100);
         }
-        SharedPreferences prfs = LaunchActivity.this.getSharedPreferences("gowhere", Context.MODE_PRIVATE);
+        SharedPreferences prfs = PreferenceManager.getDefaultSharedPreferences(this);
         if (prfs.getInt("citycode", 0) != 0) {
             Intent intent = new Intent(this, LandmarkActivity.class);
             intent.putExtra("countrycode", prfs.getInt("countrycode", 0));

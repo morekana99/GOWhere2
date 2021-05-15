@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -54,6 +55,9 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+/**
+ * @author devonwong
+ */
 public class LandmarkActivity extends AppCompatActivity {
     public DrawerLayout mDrawLayout;
     private  List<Landmark> landmarkList = new ArrayList<>();
@@ -66,6 +70,10 @@ public class LandmarkActivity extends AppCompatActivity {
     GridLayoutManager layoutManager ;
 
     private static boolean isExit = false;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    private String dbIP = "http://"+HttpUtill.oneIP+":8080/landmark/";
 
     @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler() {
@@ -83,15 +91,12 @@ public class LandmarkActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window window = getWindow();
-            window.setFlags(
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        if (Build.VERSION.SDK_INT >= 21) {
+            View decorview = getWindow().getDecorView();
+            decorview.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         setContentView(R.layout.activity_landmark);
-
-
 
         Intent intent = getIntent();
         country = intent.getIntExtra("countrycode",0);
@@ -119,17 +124,34 @@ public class LandmarkActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         adapter = new LandmarkAdapter(dataList);
         recyclerView.setAdapter(adapter);
-
-        SharedPreferences sp=LandmarkActivity.this.getSharedPreferences("gowhere", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putInt("citycode", city);
-        editor.putInt("countrycode", country);
-        editor.apply();
-
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                //设置RecyclerView滑到顶部时，SwipeRefreshLayout才响应下拉刷新,否则响应RecyclerView下滑
+                if (recyclerView == null) {
+                    swipeRefreshLayout.setEnabled(true);
+                }
+                if (recyclerView != null) {
+                    swipeRefreshLayout.setEnabled(recyclerView.getChildCount() == 0
+                            || recyclerView.getChildAt(0).getTop() >= 0);
+                }
+            }
+        });
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                DataSupport.deleteAll(Landmark.class,"cityId=?",city+"");
+                String address = dbIP+  country+ "/" + city;
+                queryFromServer(address);
+            }
+        });
         queryLandmarks();
 
 
     }
+    @Override
     public  boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.toolbar,menu);
         return true;
@@ -140,7 +162,7 @@ public class LandmarkActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.more:
                 Intent mylocation = new Intent(LandmarkActivity.this,WebActivity.class);
-                String url= "http://api.map.baidu.com/geocoder?address=&output=html&src=webapp.martin.gowhere";
+                String url= "http://uri.amap.com/search?keyword=&view=map&src=gowhere&coordinate=gaode&callnative=0";
                 mylocation.putExtra("landmark_url",url);
                 startActivity(mylocation);
                 break;
@@ -158,44 +180,6 @@ public class LandmarkActivity extends AppCompatActivity {
         city = cityCode;
         queryLandmarks();
     }
-
-
-
-
-
-
-    /*public void initLandmark(int countryCode,int cityCode) {
-        dataList.clear();
-
-        if (countryCode == 1 && cityCode ==2) {
-            getSupportActionBar().setTitle("大连");
-            for (int i = 0; i < 50; i++) {
-
-                int index = i%15;
-                dataList.add(dalianList[index]);
-            }
-        } else if (countryCode == 3&& cityCode == 1) {
-            getSupportActionBar().setTitle("纽约");
-            for (int i = 0; i < 50; i++) {
-
-                int index = i%10;
-                dataList.add(newyorkList[index]);
-            }
-
-        } else if (countryCode ==2 && cityCode == 1) {
-            getSupportActionBar().setTitle("东京");
-            for (int i = 0; i < 50; i++) {
-
-                int index = i%10;
-                dataList.add(tokyoList[index]);
-            }
-
-        }
-
-
-    }*/
-
-
 
     /**
      * 显示Loading框
@@ -247,18 +231,24 @@ public class LandmarkActivity extends AppCompatActivity {
         landmarkList = DataSupport.where("cityid = ?",String.valueOf(city)).find(Landmark.class);
         if(landmarkList.size() > 0) {
             dataList.clear();
-            for (Landmark landmark : landmarkList) {
-                dataList.add(new Landmarkdata(country,landmark.getLandmarkName(),landmark.getImageId(),landmark.getCityName()));
-            }
+            for(int i=0;i<6;i++) {
+                for (Landmark landmark : landmarkList) {
 
+                    dataList.add(new Landmarkdata(country, landmark.getLandmarkName(), landmark.getImageId(), landmark.getCityName()));
+                }
+            }
+            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(LandmarkActivity.this).edit();
+            editor.putInt("citycode", city);
+            editor.putInt("countrycode", country);
+            editor.apply();
             adapter.notifyDataSetChanged();
         }else{
-            String address = "http://192.168.3.59:8080/landmark/" +  country+ "/" + city;
+            String address = dbIP +  country+ "/" + city;
             queryFromServer(address);
         }
+        swipeRefreshLayout.setRefreshing(false);
     }
     private void queryFromServer(String address){
-        showProgressDialog();
         HttpUtill.sendOkHttpRequest(address, new Callback() {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
@@ -270,7 +260,7 @@ public class LandmarkActivity extends AppCompatActivity {
                     LandmarkActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            closeProgressDialog();
+                            swipeRefreshLayout.setRefreshing(false);
                             queryLandmarks();
                         }
                     });
@@ -283,7 +273,7 @@ public class LandmarkActivity extends AppCompatActivity {
                     @TargetApi(Build.VERSION_CODES.M)
                     @Override
                     public void run() {
-                        closeProgressDialog();
+                        swipeRefreshLayout.setRefreshing(false);
                         Toast.makeText(LandmarkActivity.this,"无网络连接，请检查网络",Toast.LENGTH_SHORT).show();
                     }
                 });
