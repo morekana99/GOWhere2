@@ -2,6 +2,7 @@ package com.example.ryan.gomap3;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,14 +13,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.example.ryan.db.Landmark;
 import com.example.ryan.db.Landmarkdata;
 
 import java.util.List;
 
+/**
+ * @author devonwong
+ */
 public class LandmarkAdapter extends RecyclerView.Adapter<LandmarkAdapter.ViewHolder> {
     private Context mContext;
-    private List<Landmarkdata> mLandmarkList;
+    private final List<Landmarkdata> mLandmarkList;
     static  class ViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         ImageView landmarkimage;
@@ -37,6 +44,7 @@ public class LandmarkAdapter extends RecyclerView.Adapter<LandmarkAdapter.ViewHo
         mLandmarkList=landmarkList;
 
     }
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         if(mContext == null){
@@ -66,7 +74,8 @@ public class LandmarkAdapter extends RecyclerView.Adapter<LandmarkAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder,int position) {
         Landmarkdata landmark = mLandmarkList.get(position);
         holder.landmarkname.setText(landmark.getLandmarkName());
-        Glide.with(mContext).load("http://uitlearn.top/images/p"+landmark.getImageId()+".jpg").into(holder.landmarkimage);
+        DrawableCrossFadeFactory drawableCrossFadeFactory = new DrawableCrossFadeFactory.Builder(500).setCrossFadeEnabled(true).build();
+        Glide.with(mContext).load("http://uitlearn.top/images/p"+landmark.getImageId()+".jpg").apply(new RequestOptions().placeholder(R.drawable.loading).fitCenter()).transition(DrawableTransitionOptions.with(drawableCrossFadeFactory)).into(holder.landmarkimage);
     }
     @Override
     public int getItemCount(){

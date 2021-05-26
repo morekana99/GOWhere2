@@ -13,8 +13,10 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +24,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -29,6 +32,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.ActionBar;
@@ -47,9 +52,12 @@ import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
+import java.util.ServiceConfigurationError;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -73,7 +81,6 @@ public class LandmarkActivity extends AppCompatActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
-    private String dbIP = "http://"+HttpUtill.oneIP+":8080/landmark/";
 
     @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler() {
@@ -92,8 +99,8 @@ public class LandmarkActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= 21) {
-            View decorview = getWindow().getDecorView();
-            decorview.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         setContentView(R.layout.activity_landmark);
@@ -102,7 +109,18 @@ public class LandmarkActivity extends AppCompatActivity {
         country = intent.getIntExtra("countrycode",0);
         city = intent.getIntExtra("citycode",0);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        EditText editText = (EditText) findViewById(R.id.toolbar_edit);
+        editText.setFocusable(false);
+        editText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LandmarkActivity.this,SearchLandmarkActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.anim_fade_in,R.anim.anim_fade_out);
+            }
+        });
         setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         mDrawLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.trans_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -126,24 +144,21 @@ public class LandmarkActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 //设置RecyclerView滑到顶部时，SwipeRefreshLayout才响应下拉刷新,否则响应RecyclerView下滑
-                if (recyclerView == null) {
-                    swipeRefreshLayout.setEnabled(true);
-                }
-                if (recyclerView != null) {
-                    swipeRefreshLayout.setEnabled(recyclerView.getChildCount() == 0
-                            || recyclerView.getChildAt(0).getTop() >= 0);
-                }
+                swipeRefreshLayout.setEnabled(recyclerView.getChildCount() == 0
+                        || recyclerView.getChildAt(0).getTop() >= 0);
+
             }
         });
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,R.color.colorPrimaryDark);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 DataSupport.deleteAll(Landmark.class,"cityId=?",city+"");
-                String address = dbIP+  country+ "/" + city;
+                String address = HttpUtill.oneIP + country+ "/" + city;
                 queryFromServer(address);
             }
         });
@@ -154,26 +169,48 @@ public class LandmarkActivity extends AppCompatActivity {
     @Override
     public  boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.toolbar,menu);
-        return true;
+        MenuItem location = menu.findItem(R.id.location);
+        return super.onCreateOptionsMenu(menu);
     }
     @SuppressLint("NonConstantResourceId")
     @Override
     public  boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
-            case R.id.more:
-                Intent mylocation = new Intent(LandmarkActivity.this,WebActivity.class);
+
+            case R.id.location:
+                Intent myLocation = new Intent(LandmarkActivity.this,WebActivity.class);
                 String url= "http://uri.amap.com/search?keyword=&view=map&src=gowhere&coordinate=gaode&callnative=0";
-                mylocation.putExtra("landmark_url",url);
-                startActivity(mylocation);
+                myLocation.putExtra("landmark_url",url);
+                startActivity(myLocation);
                 break;
             case android.R.id.home:
                 mDrawLayout.openDrawer(GravityCompat.START);
                 break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + item.getItemId());
         }
 
 
         return true;
     }
+/*
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu)
+    {
+        if (menu != null) {
+            if (menu.getClass().getSimpleName().equalsIgnoreCase("MenuBuilder")) {
+                try {
+                    Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    method.setAccessible(true);
+                    method.invoke(menu, true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
+*/
 
     public  void initLandmarkList(int countryCode,int cityCode){
         country = countryCode;
@@ -181,25 +218,7 @@ public class LandmarkActivity extends AppCompatActivity {
         queryLandmarks();
     }
 
-    /**
-     * 显示Loading框
-     */
-    private void showProgressDialog(){
-        if(progressDialog == null){
-            progressDialog = new ProgressDialog(LandmarkActivity.this);
-            progressDialog.setMessage("正在加载...");
-            progressDialog.setCanceledOnTouchOutside(false);
-        }
-        progressDialog.show();
-    }
-    /**
-     *关闭进度框
-     */
-    private void closeProgressDialog(){
-        if (progressDialog != null){
-            progressDialog.dismiss();
-        }
-    }
+
     public int  getResource(String imageName){
         Context ctx=getBaseContext();
         int resId = getResources().getIdentifier(imageName, "drawable", ctx.getPackageName());
@@ -224,7 +243,6 @@ public class LandmarkActivity extends AppCompatActivity {
             mHandler.sendEmptyMessageDelayed(0, 2000);
         } else {
             finish();
-            System.exit(0);
         }
     }
     private void queryLandmarks(){
@@ -243,7 +261,7 @@ public class LandmarkActivity extends AppCompatActivity {
             editor.apply();
             adapter.notifyDataSetChanged();
         }else{
-            String address = dbIP +  country+ "/" + city;
+            String address = HttpUtill.oneIP +  country+ "/" + city;
             queryFromServer(address);
         }
         swipeRefreshLayout.setRefreshing(false);

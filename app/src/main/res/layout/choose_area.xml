@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fff"
+    android:background="@color/colorPrimary"
     android:fitsSystemWindows="true">
 
     <RelativeLayout
@@ -32,7 +32,7 @@
     </RelativeLayout>
     <ListView
         android:id="@+id/list_view"
-        android:background="@drawable/bg_place"
+        android:background="@drawable/bg2"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

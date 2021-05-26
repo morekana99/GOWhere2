@@ -1,5 +1,6 @@
 package com.example.ryan.gomap3;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -17,20 +18,38 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.amap.api.maps.model.Text;
+import com.autonavi.ae.pos.LocGSVData;
 import com.bumptech.glide.Glide;
+import com.example.ryan.db.Landmark;
+import com.example.ryan.utill.HttpUtill;
+import com.example.ryan.utill.Utility;
 
+import org.json.JSONException;
+import org.litepal.crud.DataSupport;
 
+import java.io.IOException;
+import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+
+import static org.litepal.LitePalApplication.getContext;
 
 
 /**
  * The type Landmark detail activity.
+ * @author devonwong
  */
 public class Landmark_DetailActivity extends AppCompatActivity {
     public static final String LANDMARK_NAME = "Landmark_name";
     public  static final String LANDMARK_IMAGE_ID = "landmark_image_id";
     public  static final String LANDMARK_CITY_NAME = "landmark_city_name";
     public  static final String LANDMARK_COUNTRY_ID = "landmark_country_id";
+
     private String url;
+;
 
 
     @Override
@@ -48,7 +67,6 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         int landmarkImageid = intent.getIntExtra(LANDMARK_IMAGE_ID,0);
         final int countryCode = intent.getIntExtra(LANDMARK_COUNTRY_ID,0);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.navgation);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout)
                  findViewById(R.id.collapsing_toolbar);
@@ -82,30 +100,8 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         });
     }
     private String generateLandmarkContent(String landmarkName){
-        if(landmarkName.equals("大连理工大学")) {
-            return this.getString(R.string.大连理工大学);
-        }
-        else if(landmarkName.equals("星海广场")){
-            return this.getString(R.string.星海广场);
-        }
-        else if(landmarkName.equals("自由女神像")){
-            return this.getString(R.string.自由女神像);
-        }
-        else if(landmarkName.equals("复仇者大厦")){
-            return this.getString(R.string.复仇者大厦);
-        }
-        else if(landmarkName.equals("东京塔")){
-            return this.getString(R.string.东京塔);
-        }
-        else if(landmarkName.equals("童牛岭")) {
-            return this.getString(R.string.童牛岭);
-        }
-        else if(landmarkName.equals("布鲁克林大桥")) {
-            return this.getString(R.string.童牛岭);
-        }
-        else {
-            return "     未能获取到信息...";
-        }
+        return DataSupport.select("detail").where("landmarkName = ?",landmarkName).findFirst(Landmark.class).getDetail();
+
     }
 
     @Override
@@ -117,6 +113,8 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
 
 

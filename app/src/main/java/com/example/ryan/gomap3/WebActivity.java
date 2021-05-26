@@ -16,10 +16,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
-import android.widget.Toast;
 
-import java.util.Random;
 
 
 public class WebActivity extends AppCompatActivity {
@@ -63,24 +60,6 @@ public class WebActivity extends AppCompatActivity {
         String uristr =intent.getStringExtra("landmark_url");
         Log.d("dd", uristr);
         webView.loadUrl(uristr);
-
-
-//        if (data!=null){
-//            String uristr = "http://api.map.baidu.com/geocoder?" + data
-//                    + "&output=html&src=yhc";
-//            webView.loadUrl(uristr);
-//
-//        }
-//        else {
-//            String cityName =intent.getStringExtra("extra_data");
-//            String uristr = "http://api.map.baidu.com/geocoder?" + cityName
-//                    + "&output=html&src=yhc";
-//
-////            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WebActivity.this).edit();
-////            editor.putString("cityname",uristr);
-////            editor.apply();
-//            webView.loadUrl(uristr);
-//        }
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
@@ -96,7 +75,9 @@ public class WebActivity extends AppCompatActivity {
 
 
     }
+
     //点击返回键，返回上一个页面，而不是退出程序
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
             webView.goBack();

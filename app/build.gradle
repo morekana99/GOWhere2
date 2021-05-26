@@ -6,8 +6,9 @@ android {
     sourceSets.main.jniLibs.srcDirs = ['libs']
     defaultConfig {
         applicationId "com.example.ryan.gomap3"
-        minSdkVersion 15
-        targetSdkVersion 27
+        minSdkVersion 19
+        //noinspection ExpiredTargetSdkVersion
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -47,6 +48,7 @@ dependencies {
     implementation files('libs/YoudaoBase_v2.0.4.jar')
     implementation files('libs/YoudaoTranslateOnline_v2.0.2.jar')
     implementation 'com.tiancaicc.springfloatingactionmenu:library:0.0.2'
+    implementation 'com.carson_ho:SearchLayout:1.0.1'
 
 
 }

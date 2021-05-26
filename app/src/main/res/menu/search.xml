@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/location"
+        android:id="@+id/more"
         android:icon="@drawable/myloaction"
-        android:orderInCategory="1"
         android:title="我的位置"
-        app:showAsAction="never|collapseActionView"/>
+
+        />
 
 
 </menu>

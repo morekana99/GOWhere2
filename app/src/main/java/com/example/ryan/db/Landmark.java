@@ -1,22 +1,22 @@
 package com.example.ryan.db;
 
+import com.google.gson.annotations.SerializedName;
+
 import org.litepal.crud.DataSupport;
 
+/**
+ * @author devonwong
+ */
 public class Landmark extends DataSupport {
     private int id;
+    @SerializedName("name")
     private String landmarkName;
     private String cityName;
     private int countryId;
     private int cityId;
     private int imageId;
-    private String describe;
+    private String detail;
 
-    public Landmark(){
-    };
-    public Landmark(String landmarkName, int imageId){
-        this.landmarkName = landmarkName;
-        this.imageId = imageId;
-    }
     public int getImageId(){
         return imageId;
     }
@@ -65,11 +65,22 @@ public class Landmark extends DataSupport {
         this.cityName = cityName;
     }
 
-    public String getDescribe() {
-        return describe;
+    public String getDetail() {
+        return detail;
     }
 
-    public void setDescribe(String describe) {
-        this.describe = describe;
+    public void setDetail(String detail) {
+        this.detail = detail;
     }
+    @Override
+    public String toString() {
+        return "LandmarkInfo{" +
+                "id='" + id + '\'' +
+                "cityName='" + cityName + '\'' +
+                "landmarkName='" + landmarkName + '\'' +
+                ", imageId='" + imageId + '\'' +
+                ", detail=" + detail +
+                '}';
+    }
+
 }
