@@ -1,6 +1,7 @@
 package com.example.ryan.gomap3;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -80,7 +81,6 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         collapsingToolbarLayout.setTitle(landmarkName);
         Glide.with(this).load("http://uitlearn.top/images/p"+landmarkImageid+".jpg").into(landmarkImageView);
         final String landmarkContent = generateLandmarkContent(landmarkName);
-        Toast.makeText(this,landmarkName,Toast.LENGTH_SHORT).show();
         landmarkContext.setText(landmarkContent);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,6 +93,7 @@ public class Landmark_DetailActivity extends AppCompatActivity {
                     url= "http://uri.amap.com/search?keyword=" +landmarkName
                             + "&view=map&src=gowhere&coordinate=gaode&callnative=0";
                 }
+                Log.d("url", url);
 
                 navi.putExtra("landmark_url",url);
                 startActivity(navi);
@@ -110,8 +111,18 @@ public class Landmark_DetailActivity extends AppCompatActivity {
             case android.R.id.home:
                 finish();
                 return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+    public static void actionStart(Context context,String landmarkName,String cityName,int countryId,int imageId){
+        Intent intent = new Intent(context,Landmark_DetailActivity.class);
+        intent.putExtra(LANDMARK_NAME,landmarkName);
+        intent.putExtra(LANDMARK_CITY_NAME,cityName);
+        intent.putExtra(LANDMARK_COUNTRY_ID,countryId);
+        intent.putExtra(LANDMARK_IMAGE_ID,imageId);
+        context.startActivity(intent);
     }
 
 

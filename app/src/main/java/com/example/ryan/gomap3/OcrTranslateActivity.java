@@ -25,13 +25,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.ryan.utill.BorderTextView;
+import com.example.ryan.view.BorderTextView;
 import com.example.ryan.utill.ImageUtils;
 import com.example.ryan.utill.SwListDialog;
 
 import com.youdao.sdk.app.EncryptHelper;
 import com.youdao.sdk.app.Language;
-import com.youdao.sdk.app.LanguageUtils;
 import com.youdao.sdk.ydonlinetranslate.OCRTranslateResult;
 import com.youdao.sdk.ydonlinetranslate.OcrTranslate;
 import com.youdao.sdk.ydonlinetranslate.OcrTranslateListener;

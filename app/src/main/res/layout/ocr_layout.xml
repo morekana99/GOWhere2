@@ -103,7 +103,7 @@
                     android:background="#00ffff"
                     android:scaleType="fitXY" />
 
-                <com.example.ryan.utill.BorderTextView
+                <com.example.ryan.view.BorderTextView
                     android:id="@+id/resultText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -7,16 +7,12 @@ import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Message;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -24,79 +20,85 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.ActionBar;
 
 
-
-
-
+import com.example.ryan.adapter.LandmarkAdapter;
+import com.example.ryan.adapter.RecyclerViewAdapter;
 import com.example.ryan.db.Landmark;
-import com.example.ryan.db.Landmarkdata;
+import com.example.ryan.db.LandmarkList;
 import com.example.ryan.utill.HttpUtill;
+import com.example.ryan.view.CustomLoadViewCreator;
+import com.example.ryan.view.CustomRecyclerView;
+import com.example.ryan.view.CustomRefreshViewCreator;
+import com.example.ryan.view.LoadViewCreator;
+import com.example.ryan.view.RefreshViewCreator;
 import com.example.ryan.utill.Utility;
 
 
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
-import java.util.ServiceConfigurationError;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
 /**
+ * The type Landmark activity.
+ *
  * @author devonwong
  */
 public class LandmarkActivity extends AppCompatActivity {
+
+    /**
+     * The constant COUNTRY_ID.
+     */
+    public final static String COUNTRY_ID = "COUNTRY_ID";
+    /**
+     * The constant CITY_CODE.
+     */
+    public final static String CITY_CODE = "CITY_CODE";
+
+    /**
+     * The M draw layout.
+     */
     public DrawerLayout mDrawLayout;
     private  List<Landmark> landmarkList = new ArrayList<>();
     private LandmarkAdapter adapter;
-    private List<Landmarkdata>dataList = new ArrayList<>();
+    private List<LandmarkList>dataList = new ArrayList<>();
     private int country;
     private int city;
-    private ProgressDialog progressDialog;
+    /**
+     * The Recycler view.
+     */
     RecyclerView recyclerView ;
+    /**
+     * The Layout manager.
+     */
     GridLayoutManager layoutManager ;
-
-    private static boolean isExit = false;
-
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private long clickTime = 0;
+    private static boolean isExit = false;
 
-    @SuppressLint("HandlerLeak")
-    Handler mHandler = new Handler() {
 
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            isExit = false;
-
-        }
-    };
 
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= 21) {
             View decorView = getWindow().getDecorView();
@@ -106,16 +108,15 @@ public class LandmarkActivity extends AppCompatActivity {
         setContentView(R.layout.activity_landmark);
 
         Intent intent = getIntent();
-        country = intent.getIntExtra("countrycode",0);
-        city = intent.getIntExtra("citycode",0);
+        country = intent.getIntExtra(COUNTRY_ID,0);
+        city = intent.getIntExtra(CITY_CODE,0);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         EditText editText = (EditText) findViewById(R.id.toolbar_edit);
         editText.setFocusable(false);
         editText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LandmarkActivity.this,SearchLandmarkActivity.class);
-                startActivity(intent);
+                SearchLandmarkActivity.actionStart(LandmarkActivity.this);
                 overridePendingTransition(R.anim.anim_fade_in,R.anim.anim_fade_out);
             }
         });
@@ -193,25 +194,13 @@ public class LandmarkActivity extends AppCompatActivity {
 
         return true;
     }
-/*
-    @Override
-    public boolean onMenuOpened(int featureId, Menu menu)
-    {
-        if (menu != null) {
-            if (menu.getClass().getSimpleName().equalsIgnoreCase("MenuBuilder")) {
-                try {
-                    Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
-                    method.setAccessible(true);
-                    method.invoke(menu, true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return super.onMenuOpened(featureId, menu);
-    }
-*/
 
+    /**
+     * Init landmark list.
+     *
+     * @param countryCode the country code
+     * @param cityCode    the city code
+     */
     public  void initLandmarkList(int countryCode,int cityCode){
         country = countryCode;
         city = cityCode;
@@ -219,6 +208,12 @@ public class LandmarkActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Get resource int.
+     *
+     * @param imageName the image name
+     * @return the int
+     */
     public int  getResource(String imageName){
         Context ctx=getBaseContext();
         int resId = getResources().getIdentifier(imageName, "drawable", ctx.getPackageName());
@@ -226,40 +221,42 @@ public class LandmarkActivity extends AppCompatActivity {
         return resId;
     }
     @Override
+    public void onBackPressed() {
+        exit();
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // 是否触发按键为back键
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            exit();
-            return false;
+            onBackPressed();
+            return true;
+        } else { // 如果不是back键正常响应
+            return super.onKeyDown(keyCode, event);
         }
-        return super.onKeyDown(keyCode, event);
     }
 
     private void exit() {
-        if (!isExit) {
-            isExit = true;
-            Toast.makeText(getApplicationContext(), "再按一次退出程序",
-                    Toast.LENGTH_SHORT).show();
-            // 利用handler延迟发送更改状态信息
-            mHandler.sendEmptyMessageDelayed(0, 2000);
+        if ((System.currentTimeMillis() - clickTime) > 2000) {
+            Toast.makeText(this, "再按一次退出", Toast.LENGTH_SHORT).show();
+            clickTime = System.currentTimeMillis();
         } else {
-            finish();
+            this.finish();
         }
     }
     private void queryLandmarks(){
         landmarkList = DataSupport.where("cityid = ?",String.valueOf(city)).find(Landmark.class);
         if(landmarkList.size() > 0) {
+            int previousSize = dataList.size();
             dataList.clear();
+            adapter.notifyItemRangeRemoved(0,previousSize);
             for(int i=0;i<6;i++) {
                 for (Landmark landmark : landmarkList) {
 
-                    dataList.add(new Landmarkdata(country, landmark.getLandmarkName(), landmark.getImageId(), landmark.getCityName()));
+                    dataList.add(new LandmarkList(country, landmark.getLandmarkName(), landmark.getImageId(), landmark.getCityName()));
                 }
             }
-            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(LandmarkActivity.this).edit();
-            editor.putInt("citycode", city);
-            editor.putInt("countrycode", country);
-            editor.apply();
-            adapter.notifyDataSetChanged();
+            adapter.notifyItemChanged(0,landmarkList.size());
         }else{
             String address = HttpUtill.oneIP +  country+ "/" + city;
             queryFromServer(address);
@@ -297,6 +294,20 @@ public class LandmarkActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    /**
+     * Action start.
+     *
+     * @param context   the context
+     * @param countryId the country id
+     * @param cityCode  the city code
+     */
+    public static void actionStart(Context context,int countryId,int cityCode){
+        Intent intent = new Intent(context,LandmarkActivity.class);
+        intent.putExtra(COUNTRY_ID,countryId);
+        intent.putExtra(CITY_CODE,cityCode);
+        context.startActivity(intent);
     }
 
 }

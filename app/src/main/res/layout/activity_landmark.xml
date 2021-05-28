@@ -20,7 +20,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     >
-                    <android.support.v7.widget.RecyclerView
+                    <com.example.ryan.view.CustomRecyclerView
                         android:id="@+id/recycler_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
-                    android:layout_width="403dp"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingLeft="10dp"
                     android:background="?attr/colorPrimary"
@@ -47,13 +47,12 @@
                     <EditText
                         android:id="@+id/toolbar_edit"
                         android:layout_width="match_parent"
-                        android:layout_height="29dp"
+                        android:layout_height="match_parent"
                         android:background="@drawable/edit_style_click"
                         android:cursorVisible="false"
+                        android:paddingStart="6dp"
                         android:drawableStart="@drawable/ic_edit_search"
                         android:importantForAutofill="no"
-                        android:paddingStart="6dp"
-                        android:paddingTop="4dp"
                         android:singleLine="true"
                         android:textColor="#95A1AA"
                         tools:ignore="LabelFor,RtlSymmetry,TextFields" />

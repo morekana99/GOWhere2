@@ -5,16 +5,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SearchLandmarkActivity">
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/search_recycler"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">>
-    </android.support.v7.widget.RecyclerView>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="搜索历史"
+            android:textSize="14sp"
+            android:textColor="#000000"
+            android:layout_marginTop="6sp"
+            android:layout_marginBottom="6sp"
+            android:layout_marginStart="10sp"
+            android:textStyle="bold"
+            />
+
+        <com.example.ryan.view.RecyclerViewWithContextMenu
+            android:id="@+id/search_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -34,30 +51,39 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-                <EditText
+                <AutoCompleteTextView
                     android:id="@+id/search_toolbar_edit"
-                    android:layout_width="337dp"
-                    android:layout_height="28dp"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:background="@drawable/edit_style"
                     android:drawableStart="@drawable/ic_edit_search"
+                    android:imeOptions="actionSearch"
                     android:importantForAutofill="no"
-                    android:paddingStart="6dp"
-                    android:paddingTop="4dp"
                     android:singleLine="true"
+                    android:paddingStart="6dp"
+                    android:drawablePadding="6dp"
                     android:textColor="#000000"
                     android:textCursorDrawable="@drawable/edit_cursor_shape"
                     android:textSize="16sp"
-                    tools:ignore="LabelFor,RtlSymmetry,TextFields" />
+                    android:layout_marginEnd="15dp"
+                    android:gravity="center_vertical"
+                    tools:ignore="LabelFor,RtlSymmetry,TextFields"
+                    android:hint="请输入搜索内容"
+                    android:completionThreshold="1"
+                    android:dropDownHeight="wrap_content"
+                    android:dropDownWidth="match_parent"
+                    android:dropDownVerticalOffset="15dp"/>
 
                 <TextView
                     android:id="@+id/search_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:layout_marginStart="10dp"
-                    android:textSize="17sp"
+                    android:layout_marginEnd="15dp"
+                    android:gravity="center_vertical"
+                    android:text="取消"
                     android:textColor="#FFFFFF"
-                    android:text="取消" />
+                    android:textSize="17sp" />
             </LinearLayout>
 
 

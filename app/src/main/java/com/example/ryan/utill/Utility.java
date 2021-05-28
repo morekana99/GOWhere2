@@ -62,7 +62,6 @@ public class  Utility {
             List<Landmark> gsonLandmarkList = new Gson().fromJson(response, new TypeToken<List<Landmark>>(){}.getType());
             for (Landmark mLandmark :gsonLandmarkList) {
                 Landmark landmark = new Landmark();
-                Log.d("KANA", mLandmark.toString());
                 landmark.setLandmarkName(mLandmark.getLandmarkName());
                 landmark.setCityId(cityId);
                 landmark.setCountryId(mLandmark.getCountryId());
@@ -73,27 +72,6 @@ public class  Utility {
             }
             return true;
 
-     /*         try {
-                JSONArray allLandmarks = new JSONArray(response);
-                for (int i=0;i<allLandmarks.length();i++){
-                    JSONObject landmarksJSONObject = allLandmarks.getJSONObject(i);
-                    Landmark landmark = new Landmark();
-                    landmark.setLandmarkName(landmarksJSONObject.getString("name"));
-                    landmark.setCityId(cityId);
-                    landmark.setCountryId(landmarksJSONObject.getInt("countryId"));
-                    landmark.setImageId(landmarksJSONObject.getInt("imageId"));
-                    landmark.setCityName(landmarksJSONObject.getString("cityName"));
-                    if(TextUtils.isEmpty(landmarksJSONObject.getString("detail"))){
-                        landmark.setDetail(landmarksJSONObject.getString("detail"));
-                    }else {
-                        landmark.setDetail("很抱歉，该景点暂无简介信息，工程师正在抓紧完善");
-                    }
-                    landmark.save();
-                }
-                return true;
-            }catch (JSONException e){
-                e.printStackTrace();
-            }*/
         }
         return false;
     }

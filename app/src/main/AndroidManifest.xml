@@ -26,36 +26,33 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".SearchLandmarkActivity"
-            android:windowSoftInputMode="stateVisible"/>
+        <activity android:name=".BaseActivity"></activity>
+        <activity
+            android:name=".SearchLandmarkActivity"
+            android:windowSoftInputMode="stateVisible" />
 
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="16ccb0cffad5932eaa95d14c1c6119ec" /> <!-- 定位需要的服务 -->
         <service android:name="com.amap.api.location.APSService" />
 
-        <activity android:name=".LaunchActivity">
+        <activity
+            android:name=".LaunchActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- <activity android:name="com.example.ryan.gomap3.MainActivity"> -->
-        <!-- &lt;!&ndash;<intent-filter>&ndash;&gt; -->
-        <!-- &lt;!&ndash;<action android:name="android.intent.action.MAIN"/>&ndash;&gt; -->
-        <!-- &lt;!&ndash;<category android:name="android.intent.category.LAUNCHER"/>&ndash;&gt; -->
-        <!-- &lt;!&ndash;</intent-filter>&ndash;&gt; -->
-        <!-- </activity> -->
-        <activity android:name=".WebActivity" />
-        <activity android:name=".LandmarkActivity" />
-        <activity android:name=".Landmark_DetailActivity" />
-        <activity android:name=".TransActivity">
-            <intent-filter>
-                <action android:name="android.media.action.IMAGE_CAPTURE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
+
+        <activity android:name=".WebActivity" />
+
+        <activity
+            android:name=".LandmarkActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden"/>
+
+        <activity android:name=".Landmark_DetailActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -67,7 +64,6 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".Choose_LanguageActivity" />
         <activity
             android:name=".OcrTranslateActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />

@@ -1,7 +1,6 @@
 package com.example.ryan.gomap3;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -9,7 +8,11 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+
+import static com.example.ryan.gomap3.Choose_areaFragment.SP_CITY_CODE;
+import static com.example.ryan.gomap3.Choose_areaFragment.SP_COUNTRY_ID;
+import static com.example.ryan.gomap3.LandmarkActivity.CITY_CODE;
+import static com.example.ryan.gomap3.LandmarkActivity.COUNTRY_ID;
 
 
 public class LaunchActivity extends AppCompatActivity {
@@ -47,10 +50,10 @@ public class LaunchActivity extends AppCompatActivity {
             }, 100);
         }
         SharedPreferences prfs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prfs.getInt("citycode", 0) != 0) {
+        if (prfs.getInt(SP_CITY_CODE, 0) != 0) {
             Intent intent = new Intent(this, LandmarkActivity.class);
-            intent.putExtra("countrycode", prfs.getInt("countrycode", 0));
-            intent.putExtra("citycode", prfs.getInt("citycode", 0));
+            intent.putExtra(COUNTRY_ID, prfs.getInt(SP_COUNTRY_ID, 0));
+            intent.putExtra(CITY_CODE, prfs.getInt(SP_CITY_CODE, 0));
             startActivity(intent);
             finish();
         }
