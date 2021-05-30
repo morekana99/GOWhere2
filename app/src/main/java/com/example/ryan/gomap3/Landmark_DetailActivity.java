@@ -1,46 +1,69 @@
 package com.example.ryan.gomap3;
 
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.amap.api.maps.model.Text;
-import com.autonavi.ae.pos.LocGSVData;
+import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
+import com.elmargomez.typer.Font;
+import com.elmargomez.typer.Typer;
 import com.example.ryan.db.Landmark;
+import com.example.ryan.entity.LandmarkViewInfo;
+import com.example.ryan.entity.TuchongEntity;
 import com.example.ryan.utill.HttpUtill;
+import com.example.ryan.utill.ScreenUtil;
 import com.example.ryan.utill.Utility;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.gson.Gson;
+import com.stx.xhb.xbanner.XBanner;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
-import org.json.JSONException;
+
 import org.litepal.crud.DataSupport;
 
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-import static org.litepal.LitePalApplication.getContext;
-
 
 /**
  * The type Landmark detail activity.
+ *
  * @author devonwong
  */
 public class Landmark_DetailActivity extends AppCompatActivity {
@@ -48,8 +71,10 @@ public class Landmark_DetailActivity extends AppCompatActivity {
     public  static final String LANDMARK_IMAGE_ID = "landmark_image_id";
     public  static final String LANDMARK_CITY_NAME = "landmark_city_name";
     public  static final String LANDMARK_COUNTRY_ID = "landmark_country_id";
-
+    private int landmarkImageId;
+    private XBanner mBanner;
     private String url;
+    List<LandmarkViewInfo> data;
 ;
 
 
@@ -65,7 +90,7 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         final Intent intent = getIntent();
         final String landmarkName = intent.getStringExtra(LANDMARK_NAME);
         final String cityName = intent.getStringExtra(LANDMARK_CITY_NAME);
-        int landmarkImageid = intent.getIntExtra(LANDMARK_IMAGE_ID,0);
+        landmarkImageId = intent.getIntExtra(LANDMARK_IMAGE_ID,0);
         final int countryCode = intent.getIntExtra(LANDMARK_COUNTRY_ID,0);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.navgation);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -79,7 +104,12 @@ public class Landmark_DetailActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         collapsingToolbarLayout.setTitle(landmarkName);
-        Glide.with(this).load("http://uitlearn.top/images/p"+landmarkImageid+".jpg").into(landmarkImageView);
+        Typeface font = Typer.set(this).getFont(Font.ROBOTO_BOLD);
+        collapsingToolbarLayout.setExpandedTitleTypeface(font);
+        collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
+        collapsingToolbarLayout.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
+        Glide.with(this).load("http://106.12.199.128/images/p"+ landmarkImageId +".jpg").apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)).into(landmarkImageView);
         final String landmarkContent = generateLandmarkContent(landmarkName);
         landmarkContext.setText(landmarkContent);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -99,11 +129,19 @@ public class Landmark_DetailActivity extends AppCompatActivity {
                 startActivity(navi);
             }
         });
+
+
+        mBanner = findViewById(R.id.banner);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ScreenUtil.getScreenWidth(this) / 2);
+        mBanner.setLayoutParams(layoutParams);
+        initBanner(mBanner);
+        initData();
     }
     private String generateLandmarkContent(String landmarkName){
         return DataSupport.select("detail").where("landmarkName = ?",landmarkName).findFirst(Landmark.class).getDetail();
 
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
@@ -123,6 +161,98 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         intent.putExtra(LANDMARK_COUNTRY_ID,countryId);
         intent.putExtra(LANDMARK_IMAGE_ID,imageId);
         context.startActivity(intent);
+    }
+
+    private void initBanner(XBanner banner) {
+        //设置广告图片点击事件
+        banner.setOnItemClickListener(new XBanner.OnItemClickListener() {
+            @Override
+            public void onItemClick(XBanner banner, Object model, View view, int position) {
+                LogUtils.i("click pos:" + position);
+                ToastUtils.showShort("点击了第" + (position + 1) + "图片");
+            }
+        });
+        //加载广告图片
+        banner.loadImage(new XBanner.XBannerAdapter() {
+            @Override
+            public void loadBanner(XBanner banner, Object model, View view, int position) {
+                RoundedCorners roundedCorners = new RoundedCorners(20);
+                RequestOptions coverRequestOptions = new RequestOptions()
+                        .transforms(new CenterCrop(),roundedCorners)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE);
+                Glide.with(Landmark_DetailActivity.this)
+                        .load(((LandmarkViewInfo)model).getXBannerUrl())
+                        .apply(coverRequestOptions
+                                .placeholder(R.drawable.default_image)
+                                .error(R.drawable.default_image))
+                        .into((ImageView)view);
+            }
+        });
+        banner.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+            }
+            @Override
+            public void onPageSelected(int i) {
+                Log.i("onPageSelected===>", i + "");
+            }
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+    }
+
+    /**
+     * 初始化数据
+     */
+    private void initData() {
+        //加载网络图片资源
+        String url = "http://192.168.3.43:8081/landmark/imgamount/"+landmarkImageId;
+        Log.d("kana", "url: "+url);
+        HttpUtill.sendOkHttpRequest(url,new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Landmark_DetailActivity.this.runOnUiThread(new Runnable() {
+                    @TargetApi(Build.VERSION_CODES.M)
+                    @Override
+                    public void run() {
+                        Toast.makeText(Landmark_DetailActivity.this, "加载数据失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseText = response.body().string();
+                int amount = Utility.getImageAmount(responseText);
+                Log.d("kana", "onResponse:amount: "+amount);
+                data = new ArrayList<>();
+                for (int i = 1; i <= amount; i++) {
+                    data.add(new LandmarkViewInfo(landmarkImageId+"00"+i));
+                }
+                Landmark_DetailActivity.this.runOnUiThread(new Runnable() {
+                    @TargetApi(Build.VERSION_CODES.M)
+                    @Override
+                    public void run() {
+                        //刷新数据之后，需要重新设置是否支持自动轮播
+                        mBanner.setAutoPlayAble(data.size() > 1);
+                        mBanner.setIsClipChildrenMode(true);
+                        mBanner.setBannerData(data);
+                    }
+                });
+            }
+        });
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mBanner.startAutoPlay();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mBanner.stopAutoPlay();
     }
 
 

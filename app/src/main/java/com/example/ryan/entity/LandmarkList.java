@@ -1,4 +1,4 @@
-package com.example.ryan.db;
+package com.example.ryan.entity;
 
 /**
  * @author devonwong

@@ -39,18 +39,17 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static com.example.ryan.gomap3.LandmarkActivity.COUNTRY_ID;
+import static com.example.ryan.gomap3.LandmarkActivity.COUNTRY_NAME;
+
 /**
  * @author devonwong
  */
 public class Choose_areaFragment extends Fragment {
     public static final int LEVEL_COUNTRY = 0;
     public static final int LEVEL_CITY = 1;
-    public static final String SP_COUNTRY_ID = "SP_COUNTRY_ID";
-    public static final String SP_CITY_CODE = "SP_CITY_CODE";
-    public static final String SP_COUNTRY_NAME = "SP_COUNTRY_NAME";
 
 
-    private ProgressDialog progressDialog;
     private Button backBotton;
     private ListView listview;
     private ArrayAdapter<String> adapter;
@@ -92,6 +91,7 @@ public class Choose_areaFragment extends Fragment {
                     String cityName=cityList.get(position).getCityName();
                     if(getActivity() instanceof  LaunchActivity) {
                         LandmarkActivity.actionStart(getActivity(),cityList.get(position).getCountryId(),cityList.get(position).getCityCode());
+                        getActivity().finish();
                     }
                     else if(getActivity() instanceof LandmarkActivity){
                         LandmarkActivity activity = (LandmarkActivity)getActivity();
@@ -113,8 +113,8 @@ public class Choose_areaFragment extends Fragment {
             }
         });
         SharedPreferences prfs = PreferenceManager.getDefaultSharedPreferences( getActivity());
-        int cache = prfs.getInt(SP_COUNTRY_ID,0);
-        String cacheName = prfs.getString(SP_COUNTRY_NAME,"");
+        int cache = prfs.getInt(COUNTRY_ID,0);
+        String cacheName = prfs.getString(COUNTRY_NAME,"");
         if (cache != 0) {
             selectCountry.setId(cache);
             selectCountry.setCountyName(cacheName);
@@ -140,11 +140,12 @@ public class Choose_areaFragment extends Fragment {
             String address = HttpUtill.oneIP;
             queryFromServer(address,"country");
         }
+
     }
     private void queryCities(){
         autoCompleteTextView.setHint("在"+selectCountry.getCountyName()+"内搜索");
         backBotton.setVisibility(View.VISIBLE);
-        cityList = DataSupport.where("countryid = ?", String.valueOf(selectCountry.getId())).order("cityCode").find(City.class);
+        cityList = DataSupport.where("countryId = ?", selectCountry.getId()+"").order("cityCode").find(City.class);
         if(cityList.size() > 0){
             dataList.clear();
             for(City city : cityList){
@@ -158,10 +159,10 @@ public class Choose_areaFragment extends Fragment {
             String address = HttpUtill.oneIP + countryCode;
             queryFromServer(address,"city");
         }
+        Log.e("kana", "queryCountries: "+cityList.size());
     }
 
     private void queryFromServer(String address, final String type){
-        showProgressDialog();
         Log.e("Choose_areaFragment","7");
         HttpUtill.sendOkHttpRequest(address, new Callback() {
             @Override
@@ -177,7 +178,6 @@ public class Choose_areaFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            closeProgressDialog();
                             if("country".equals(type)){
                                 queryCountries();
                             }
@@ -196,31 +196,11 @@ public class Choose_areaFragment extends Fragment {
                     @TargetApi(Build.VERSION_CODES.M)
                     @Override
                     public void run() {
-                        closeProgressDialog();
                         Toast.makeText(getContext(),"无网络连接，请检查网络",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
-    }
-    /**
-     * 显示Loading框
-     */
-    private void showProgressDialog(){
-        if(progressDialog == null){
-            progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage("正在加载...");
-            progressDialog.setCanceledOnTouchOutside(false);
-        }
-        progressDialog.show();
-    }
-    /**
-     *关闭进度框
-     */
-    private void closeProgressDialog(){
-        if (progressDialog != null){
-            progressDialog.dismiss();
-        }
     }
     public void initAutoCompareView() {
         AutoCompleteAdapter autoCompleteAdapter = new AutoCompleteAdapter(getActivity(), dataList);
@@ -272,17 +252,5 @@ public class Choose_areaFragment extends Fragment {
 
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if(spCountryId != 0) {
-            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
-            editor.putInt(SP_COUNTRY_ID, spCountryId);
-            editor.putString(SP_COUNTRY_NAME, spCountryName);
-            editor.putInt(SP_CITY_CODE, spCityId);
-            editor.apply();
-            Log.d("KANA", "onStop: "+spCountryId+"/"+spCountryName+"/"+spCityId);
-        }
-    }
 }
 

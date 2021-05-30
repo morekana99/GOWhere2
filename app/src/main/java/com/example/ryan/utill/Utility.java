@@ -75,4 +75,16 @@ public class  Utility {
         }
         return false;
     }
+    public  static  int getImageAmount(String response){
+        if(!TextUtils.isEmpty(response)){
+            try {
+                JSONArray jsonArray = new JSONArray(response);
+                JSONObject object = jsonArray.getJSONObject(0);
+                return object.getInt("imageAmount");
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
 }

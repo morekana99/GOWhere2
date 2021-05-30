@@ -4,12 +4,12 @@ package com.example.ryan.gomap3;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
-import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,15 +31,10 @@ import android.support.v7.app.ActionBar;
 
 
 import com.example.ryan.adapter.LandmarkAdapter;
-import com.example.ryan.adapter.RecyclerViewAdapter;
+import com.example.ryan.db.Country;
 import com.example.ryan.db.Landmark;
-import com.example.ryan.db.LandmarkList;
+import com.example.ryan.entity.LandmarkList;
 import com.example.ryan.utill.HttpUtill;
-import com.example.ryan.view.CustomLoadViewCreator;
-import com.example.ryan.view.CustomRecyclerView;
-import com.example.ryan.view.CustomRefreshViewCreator;
-import com.example.ryan.view.LoadViewCreator;
-import com.example.ryan.view.RefreshViewCreator;
 import com.example.ryan.utill.Utility;
 
 
@@ -61,6 +55,8 @@ import okhttp3.Response;
  * @author devonwong
  */
 public class LandmarkActivity extends AppCompatActivity {
+
+    public static final String COUNTRY_NAME = "COUNTRY_NAME";
 
     /**
      * The constant COUNTRY_ID.
@@ -256,6 +252,12 @@ public class LandmarkActivity extends AppCompatActivity {
                     dataList.add(new LandmarkList(country, landmark.getLandmarkName(), landmark.getImageId(), landmark.getCityName()));
                 }
             }
+            Country countryName = DataSupport.select("countyName").where("id=?",country+"").findFirst(Country.class);
+            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            editor.putInt(COUNTRY_ID, country);
+            editor.putString(COUNTRY_NAME, countryName.getCountyName());
+            editor.putInt(CITY_CODE, city);
+            editor.apply();
             adapter.notifyItemChanged(0,landmarkList.size());
         }else{
             String address = HttpUtill.oneIP +  country+ "/" + city;

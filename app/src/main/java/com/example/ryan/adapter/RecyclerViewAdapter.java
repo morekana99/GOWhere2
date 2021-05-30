@@ -16,7 +16,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
-import com.example.ryan.db.LandmarkList;
+import com.example.ryan.entity.LandmarkList;
 import com.example.ryan.gomap3.R;
 
 import java.util.ArrayList;

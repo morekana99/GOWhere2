@@ -12,14 +12,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
-import com.example.ryan.db.LandmarkList;
+import com.example.ryan.entity.LandmarkList;
 import com.example.ryan.gomap3.Landmark_DetailActivity;
 import com.example.ryan.gomap3.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -79,10 +79,12 @@ public class LandmarkAdapter extends RecyclerView.Adapter<LandmarkAdapter.ViewHo
         holder.landmarkname.setText(landmark.getLandmarkName());
         DrawableCrossFadeFactory drawableCrossFadeFactory = new DrawableCrossFadeFactory.Builder(500).setCrossFadeEnabled(true).build();
         Glide.with(mContext)
-                .load("http://uitlearn.top/images/p"+landmark.getImageId()+".jpg")
+                .load("http://106.12.199.128/images/p"+landmark.getImageId()+".jpg")
                 .apply(new RequestOptions()
-                .placeholder(R.drawable.loading)
-                .fitCenter())
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .placeholder(R.drawable.default_image)
+                        .error(R.drawable.default_image)
+                        .fitCenter())
                 .transition(DrawableTransitionOptions.with(drawableCrossFadeFactory))
                 .into(holder.landmarkimage);
     }
