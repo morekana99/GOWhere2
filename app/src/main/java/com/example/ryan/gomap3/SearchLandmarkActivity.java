@@ -4,13 +4,13 @@ package com.example.ryan.gomap3;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;;
 import android.view.KeyEvent;
@@ -18,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,16 +28,17 @@ import com.example.ryan.adapter.QuickAdapter;
 import com.example.ryan.db.Landmark;
 import com.example.ryan.db.SearchHistory;
 
-import com.example.ryan.filter.MySearchFilter;
 import com.example.ryan.view.RecyclerViewWithContextMenu;
 
 
 import org.litepal.crud.DataSupport;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+
+import static com.example.ryan.gomap3.LandmarkActivity.CITY_CODE;
 
 
 /**
@@ -49,17 +49,18 @@ public class SearchLandmarkActivity extends BaseActivity {
     private QuickAdapter mAdapter;
     private List<String> dataList;
     private AutoCompleteTextView autoCompleteTextView;
+    private int cityCode;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_landmark);
+        initData();
 
         initView();
 
         initEditView();
-
-        initData();
 
         initEvent();
 
@@ -124,6 +125,9 @@ public class SearchLandmarkActivity extends BaseActivity {
     }
 
     private void initData() {
+        SharedPreferences prfs = PreferenceManager.getDefaultSharedPreferences(this);
+        cityCode = prfs.getInt(CITY_CODE,0);
+
     }
 
     private void initEvent() {
@@ -195,7 +199,15 @@ public class SearchLandmarkActivity extends BaseActivity {
     @NonNull
     private List<String> createDataList(){
         List<String> list=new ArrayList<>();
-        List<SearchHistory> searchHistoryList = DataSupport.select("name").order("id desc").find(SearchHistory.class);
+
+        //全局搜索
+        //List<SearchHistory> searchHistoryList = DataSupport.select("name").order("id desc").find(SearchHistory.class);
+        List<SearchHistory> searchHistoryList = DataSupport
+                .select("name")
+                .where("cityCode=?",String.valueOf(cityCode))
+                .order("id desc")
+                .find(SearchHistory.class);
+
         for(SearchHistory i:searchHistoryList){
             list.add(i.getName());
         }
@@ -222,6 +234,7 @@ public class SearchLandmarkActivity extends BaseActivity {
         int previousSize = dataList.size();
         DataSupport.deleteAll(SearchHistory.class,"name = ?",searchStr);
         SearchHistory searchHistory = new SearchHistory();
+        searchHistory.setCityCode(cityCode);
         searchHistory.setName(searchStr);
         searchHistory.save();
         dataList.clear();
@@ -233,7 +246,9 @@ public class SearchLandmarkActivity extends BaseActivity {
 
     public ArrayList<String> createSuggestList(){
         ArrayList<String> list=new ArrayList<>();
-        List<Landmark> landmarkList = DataSupport.findAll(Landmark.class);
+        List<Landmark> landmarkList = DataSupport.select("landmarkName")
+                .where("cityId=?",String.valueOf(cityCode))
+                .find(Landmark.class);
         for(Landmark i:landmarkList){
             list.add(i.getLandmarkName());
         }

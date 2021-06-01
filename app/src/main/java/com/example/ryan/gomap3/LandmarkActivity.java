@@ -176,7 +176,7 @@ public class LandmarkActivity extends AppCompatActivity {
 
             case R.id.location:
                 Intent myLocation = new Intent(LandmarkActivity.this,WebActivity.class);
-                String url= "http://uri.amap.com/search?keyword=&view=map&src=gowhere&coordinate=gaode&callnative=0";
+                String url= "https://uri.amap.com/search?keyword=&view=map&src=gowhere&coordinate=gaode&callnative=0";
                 myLocation.putExtra("landmark_url",url);
                 startActivity(myLocation);
                 break;

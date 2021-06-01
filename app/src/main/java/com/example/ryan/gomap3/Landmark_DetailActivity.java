@@ -1,12 +1,16 @@
 package com.example.ryan.gomap3;
 
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -18,8 +22,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -52,6 +59,7 @@ import org.litepal.crud.DataSupport;
 
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +83,7 @@ public class Landmark_DetailActivity extends AppCompatActivity {
     private XBanner mBanner;
     private String url;
     List<LandmarkViewInfo> data;
-;
+
 
 
     @Override
@@ -108,7 +116,7 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         collapsingToolbarLayout.setExpandedTitleTypeface(font);
         collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
         collapsingToolbarLayout.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
-        Glide.with(this).load("http://106.12.199.128/images/p"+ landmarkImageId +".jpg").apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
+        Glide.with(this).load("https://devyn.wang/images/p"+ landmarkImageId +".jpg").apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)).into(landmarkImageView);
         final String landmarkContent = generateLandmarkContent(landmarkName);
         landmarkContext.setText(landmarkContent);
@@ -120,7 +128,7 @@ public class Landmark_DetailActivity extends AppCompatActivity {
                     url= " https://www.google.com/maps/search/?api=1&query="+cityName+landmarkName+"&hl=zh-cn";
 
                 }else{
-                    url= "http://uri.amap.com/search?keyword=" +landmarkName
+                    url= "https://uri.amap.com/search?keyword=" +landmarkName
                             + "&view=map&src=gowhere&coordinate=gaode&callnative=0";
                 }
                 Log.d("url", url);
@@ -164,12 +172,16 @@ public class Landmark_DetailActivity extends AppCompatActivity {
     }
 
     private void initBanner(XBanner banner) {
+
+
         //设置广告图片点击事件
         banner.setOnItemClickListener(new XBanner.OnItemClickListener() {
             @Override
             public void onItemClick(XBanner banner, Object model, View view, int position) {
-                LogUtils.i("click pos:" + position);
-                ToastUtils.showShort("点击了第" + (position + 1) + "图片");
+                Intent intent = new Intent(Landmark_DetailActivity.this,ImageActivity.class);
+                String url = ((LandmarkViewInfo)model).getXBannerUrl().toString();
+                intent.putExtra("url",url);
+                startActivity(intent);
             }
         });
         //加载广告图片
@@ -208,7 +220,7 @@ public class Landmark_DetailActivity extends AppCompatActivity {
      */
     private void initData() {
         //加载网络图片资源
-        String url = "http://192.168.3.43:8081/landmark/imgamount/"+landmarkImageId;
+        String url = HttpUtill.oneIP+"imgamount/"+landmarkImageId;
         Log.d("kana", "url: "+url);
         HttpUtill.sendOkHttpRequest(url,new Callback() {
             @Override
@@ -227,9 +239,16 @@ public class Landmark_DetailActivity extends AppCompatActivity {
                 int amount = Utility.getImageAmount(responseText);
                 Log.d("kana", "onResponse:amount: "+amount);
                 data = new ArrayList<>();
-                for (int i = 1; i <= amount; i++) {
-                    data.add(new LandmarkViewInfo(landmarkImageId+"00"+i));
+                if(amount!=0){
+                    for (int i = 1; i <= amount; i++) {
+                        data.add(new LandmarkViewInfo(landmarkImageId+"00"+i,true));
+                    }
+                }else {
+                    for (int i=0;i<6;i++){
+                        data.add(new LandmarkViewInfo( landmarkImageId+"" ,false));
+                    }
                 }
+
                 Landmark_DetailActivity.this.runOnUiThread(new Runnable() {
                     @TargetApi(Build.VERSION_CODES.M)
                     @Override
@@ -243,6 +262,11 @@ public class Landmark_DetailActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
+
+
     @Override
     protected void onResume() {
         super.onResume();

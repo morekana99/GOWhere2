@@ -9,10 +9,11 @@
     <ImageView
         android:id="@+id/img"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_height="425dp"
-        android:src="@drawable/bg2" />
-
+        android:src="@drawable/bg2"
+        android:scaleType="centerInside"
+        android:adjustViewBounds="true"/>
     <FrameLayout
         android:id="@+id/choose_city_actionbar"
         android:layout_width="match_parent"
@@ -30,6 +31,7 @@
                 android:layout_height="30dp"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/ic_back3"
+                android:layout_marginStart="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

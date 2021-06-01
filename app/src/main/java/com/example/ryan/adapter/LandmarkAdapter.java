@@ -79,7 +79,7 @@ public class LandmarkAdapter extends RecyclerView.Adapter<LandmarkAdapter.ViewHo
         holder.landmarkname.setText(landmark.getLandmarkName());
         DrawableCrossFadeFactory drawableCrossFadeFactory = new DrawableCrossFadeFactory.Builder(500).setCrossFadeEnabled(true).build();
         Glide.with(mContext)
-                .load("http://106.12.199.128/images/p"+landmark.getImageId()+".jpg")
+                .load("https://devyn.wang/images/p"+landmark.getImageId()+".jpg")
                 .apply(new RequestOptions()
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .placeholder(R.drawable.default_image)
