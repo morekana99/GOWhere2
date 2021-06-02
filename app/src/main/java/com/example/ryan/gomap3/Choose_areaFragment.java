@@ -88,7 +88,6 @@ public class Choose_areaFragment extends Fragment {
                     queryCities();
                 }
                 else if (currentLevel==LEVEL_CITY){
-                    String cityName=cityList.get(position).getCityName();
                     if(getActivity() instanceof  LaunchActivity) {
                         LandmarkActivity.actionStart(getActivity(),cityList.get(position).getCountryId(),cityList.get(position).getCityCode());
                         getActivity().finish();
@@ -100,6 +99,7 @@ public class Choose_areaFragment extends Fragment {
                         spCountryName = selectCountry.getCountyName();
                         activity.initLandmarkList(spCountryId,spCityId);
                         activity.mDrawLayout.closeDrawers();
+                        Log.d("kana", "onCreate: "+spCityId+"/"+spCountryId+"/"+spCountryName);
                     }
                 }
             }
@@ -127,7 +127,7 @@ public class Choose_areaFragment extends Fragment {
     private void queryCountries(){
         autoCompleteTextView.setHint("搜索国家");
         backBotton.setVisibility(View.GONE);
-        countryList = DataSupport.findAll(Country.class);
+        countryList = DataSupport.select("countryCode","countyName").order("countryCode").find(Country.class);
         if(countryList.size() > 0){
             dataList.clear();
             for(Country country : countryList){
@@ -145,7 +145,7 @@ public class Choose_areaFragment extends Fragment {
     private void queryCities(){
         autoCompleteTextView.setHint("在"+selectCountry.getCountyName()+"内搜索");
         backBotton.setVisibility(View.VISIBLE);
-        cityList = DataSupport.where("countryId = ?", selectCountry.getId()+"").order("cityCode").find(City.class);
+        cityList = DataSupport.where("countryId = ?", selectCountry.getCountryCode()+"").order("cityCode").find(City.class);
         if(cityList.size() > 0){
             dataList.clear();
             for(City city : cityList){
@@ -159,7 +159,6 @@ public class Choose_areaFragment extends Fragment {
             String address = HttpUtill.oneIP + countryCode;
             queryFromServer(address,"city");
         }
-        Log.e("kana", "queryCountries: "+cityList.size());
     }
 
     private void queryFromServer(String address, final String type){
@@ -172,7 +171,7 @@ public class Choose_areaFragment extends Fragment {
                 if("country".equals(type)){
                     result = Utility.handleCountryResponse(responseText);
                 } else if("city".equals(type)){
-                    result = Utility.handleCityResponse(responseText,selectCountry.getId());
+                    result = Utility.handleCityResponse(responseText,selectCountry.getCountryCode());
                 }
                 if (result){
                     getActivity().runOnUiThread(new Runnable() {
@@ -245,8 +244,6 @@ public class Choose_areaFragment extends Fragment {
                     imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                 }
             }
-
-
             autoCompleteTextView.setText("");
         }
 

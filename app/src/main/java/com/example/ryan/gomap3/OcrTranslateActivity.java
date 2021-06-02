@@ -52,7 +52,7 @@ import java.util.List;
 
 public class OcrTranslateActivity extends Activity {
 
-    private String[] lang = new String[]{"中文", "日文", "英文", };
+    private String[] lang = new String[]{"中文", "日文", "英文","法文","西班牙文","葡萄牙文","俄文","德文"};
 
     private TextView original;
     private Uri currentUri;

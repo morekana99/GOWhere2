@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -85,12 +86,7 @@ public class LandmarkActivity extends AppCompatActivity {
      */
     GridLayoutManager layoutManager ;
     private SwipeRefreshLayout swipeRefreshLayout;
-
     private long clickTime = 0;
-    private static boolean isExit = false;
-
-
-
 
 
     @Override
@@ -106,6 +102,7 @@ public class LandmarkActivity extends AppCompatActivity {
         Intent intent = getIntent();
         country = intent.getIntExtra(COUNTRY_ID,0);
         city = intent.getIntExtra(CITY_CODE,0);
+        Log.d("kana", "onCreate: "+country+"/"+city);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         EditText editText = (EditText) findViewById(R.id.toolbar_edit);
         editText.setFocusable(false);
