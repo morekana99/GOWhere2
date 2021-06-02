@@ -116,7 +116,7 @@ public class Choose_areaFragment extends Fragment {
         int cache = prfs.getInt(COUNTRY_ID,0);
         String cacheName = prfs.getString(COUNTRY_NAME,"");
         if (cache != 0) {
-            selectCountry.setId(cache);
+            selectCountry.setCountryCode(cache);
             selectCountry.setCountyName(cacheName);
             queryCities();
         }else {

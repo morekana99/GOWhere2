@@ -98,11 +98,8 @@ public class LandmarkActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         setContentView(R.layout.activity_landmark);
+        initData();
 
-        Intent intent = getIntent();
-        country = intent.getIntExtra(COUNTRY_ID,0);
-        city = intent.getIntExtra(CITY_CODE,0);
-        Log.d("kana", "onCreate: "+country+"/"+city);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         EditText editText = (EditText) findViewById(R.id.toolbar_edit);
         editText.setFocusable(false);
@@ -159,6 +156,17 @@ public class LandmarkActivity extends AppCompatActivity {
         queryLandmarks();
 
 
+    }
+    public void initData(){
+        Intent intent = getIntent();
+        country = intent.getIntExtra(COUNTRY_ID,0);
+        city = intent.getIntExtra(CITY_CODE,0);
+        Country countryName = DataSupport.select("countyName").where("id=?",country+"").findFirst(Country.class);
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putInt(COUNTRY_ID, country);
+        editor.putString(COUNTRY_NAME, countryName.getCountyName());
+        editor.putInt(CITY_CODE, city);
+        editor.apply();
     }
     @Override
     public  boolean onCreateOptionsMenu(Menu menu){
@@ -249,12 +257,6 @@ public class LandmarkActivity extends AppCompatActivity {
                     dataList.add(new LandmarkList(country, landmark.getLandmarkName(), landmark.getImageId(), landmark.getCityName()));
                 }
             }
-            Country countryName = DataSupport.select("countyName").where("id=?",country+"").findFirst(Country.class);
-            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-            editor.putInt(COUNTRY_ID, country);
-            editor.putString(COUNTRY_NAME, countryName.getCountyName());
-            editor.putInt(CITY_CODE, city);
-            editor.apply();
             adapter.notifyItemChanged(0,landmarkList.size());
         }else{
             String address = HttpUtill.oneIP +  country+ "/" + city;
