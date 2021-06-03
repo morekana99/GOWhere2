@@ -28,6 +28,7 @@ import com.example.ryan.adapter.QuickAdapter;
 import com.example.ryan.db.Landmark;
 import com.example.ryan.db.SearchHistory;
 
+import com.example.ryan.utill.StatusBarUtil;
 import com.example.ryan.view.RecyclerViewWithContextMenu;
 
 
@@ -56,6 +57,9 @@ public class SearchLandmarkActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_landmark);
+
+        StatusBarUtil.translucentStatusBar(this,true);
+
         initData();
 
         initView();

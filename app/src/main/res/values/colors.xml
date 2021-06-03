@@ -2,7 +2,11 @@
 <resources>
     <color name="colorPrimary">#1f6deb</color>
     <color name="colorPrimaryDark">#1f6deb</color>
+    <color name="colorPrimaryAlpha">#E61F6DEB</color>
     <color name="colorAccent">#ff4e49</color>
+    <color name="colorBackground">#f6f6f6f6</color>
+    <color name="transparent">@android:color/transparent</color>
+
     <color name="theme">#1994d0</color>
     <color name="chat">#559fca</color>
     <color name="quote">#f0983c</color>

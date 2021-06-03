@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,7 +27,11 @@ import com.example.ryan.db.City;
 import com.example.ryan.db.Country;
 import com.example.ryan.db.Landmark;
 import com.example.ryan.utill.HttpUtill;
+import com.example.ryan.utill.StatusBarUtil;
 import com.example.ryan.utill.Utility;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshLoadMoreListener;
 
 
 import org.litepal.crud.DataSupport;
@@ -63,6 +68,7 @@ public class Choose_areaFragment extends Fragment {
     private String spCountryName = "";
     private  int currentLevel;
     private AutoCompleteTextView autoCompleteTextView;
+    private RefreshLayout refreshLayout;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -72,6 +78,7 @@ public class Choose_areaFragment extends Fragment {
         backBotton = (Button) view.findViewById(R.id.back_button);
         listview = (ListView) view.findViewById(R.id.list_view);
         autoCompleteTextView = (AutoCompleteTextView)view.findViewById(R.id.title_text);
+        refreshLayout = view.findViewById(R.id.area_refresh);
         adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, dataList);
         listview.setAdapter(adapter);
         return view;
@@ -79,6 +86,7 @@ public class Choose_areaFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
+        StatusBarUtil.translucentStatusBar(getActivity(),true);
         initAutoCompareView();
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -122,6 +130,24 @@ public class Choose_areaFragment extends Fragment {
         }else {
             queryCountries();
         }
+
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                if(currentLevel==LEVEL_COUNTRY){
+                    DataSupport.deleteAll(Country.class);
+                    queryCountries();
+                    refreshLayout.finishRefresh(2000/*,false*/);//传入false表示刷新失败
+                }else if(currentLevel==LEVEL_CITY){
+                    DataSupport.deleteAll(City.class);
+                    queryCities();
+                    refreshLayout.finishRefresh(2000/*,false*/);//传入false表示刷新失败
+                }else{
+                    refreshLayout.finishRefresh(false);//传入false表示刷新失败
+                }
+            }
+        });
     }
 
     private void queryCountries(){
