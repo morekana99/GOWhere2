@@ -105,8 +105,29 @@ public class LandmarkActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landmark);
+
+        Intent intent = getIntent();
+        country = intent.getIntExtra(COUNTRY_ID,0);
+        city = intent.getIntExtra(CITY_CODE,0);
+
         initView();
-        initData();
+
+        initFreshLayout();
+    }
+    public void initView(){
+
+        toolbar = findViewById(R.id.toolbar);
+        editText = findViewById(R.id.toolbar_edit);
+        fab = findViewById(R.id.trans_fab);
+        recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setItemViewCacheSize(4);
+        layoutManager = new GridLayoutManager(this, 2);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_name);
+        mDrawLayout = findViewById(R.id.drawer_layout);
+        swipeRefreshLayout =  findViewById(R.id.swipe);
+        header = findViewById(R.id.header);
         editText.setFocusable(false);
         editText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,22 +146,6 @@ public class LandmarkActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         adapter = new LandmarkAdapter(dataList);
         recyclerView.setAdapter(adapter);
-        initFreshLayout();
-    }
-    public void initView(){
-
-        toolbar = findViewById(R.id.toolbar);
-        editText = findViewById(R.id.toolbar_edit);
-        fab = findViewById(R.id.trans_fab);
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setItemViewCacheSize(4);
-        layoutManager = new GridLayoutManager(this, 2);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_name);
-        mDrawLayout = findViewById(R.id.drawer_layout);
-        swipeRefreshLayout =  findViewById(R.id.swipe);
-        header = findViewById(R.id.header);
     }
 
     public void initFreshLayout(){
@@ -177,15 +182,13 @@ public class LandmarkActivity extends AppCompatActivity {
         });
     }
     public void initData(){
-        Intent intent = getIntent();
-        country = intent.getIntExtra(COUNTRY_ID,0);
-        city = intent.getIntExtra(CITY_CODE,0);
-        Country countryName = DataSupport.select("countyName").where("id=?",country+"").findFirst(Country.class);
+        Country countryName = DataSupport.select("countyName").where("countryCode=?",country+"").findFirst(Country.class);
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
         editor.putInt(COUNTRY_ID, country);
         editor.putString(COUNTRY_NAME, countryName.getCountyName());
         editor.putInt(CITY_CODE, city);
         editor.apply();
+        Log.e("kana", "initData: "+ countryName.getCountyName());
     }
     @Override
     public  boolean onCreateOptionsMenu(Menu menu){
@@ -265,13 +268,13 @@ public class LandmarkActivity extends AppCompatActivity {
         }
     }
     private void queryLandmarks(){
+        initData();
         landmarkList = DataSupport.where("cityid = ?",String.valueOf(city)).find(Landmark.class);
         if(landmarkList.size() > 0) {
             int previousSize = dataList.size();
             dataList.clear();
             adapter.notifyItemRangeRemoved(0,previousSize);
             for (Landmark landmark : landmarkList) {
-
                 dataList.add(new LandmarkList(country, landmark.getLandmarkName(), landmark.getImageId(), landmark.getCityName()));
             }
             adapter.notifyItemChanged(0,landmarkList.size());
