@@ -4,6 +4,7 @@ package com.example.ryan.gomap3;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 
@@ -13,6 +14,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -26,6 +29,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
@@ -43,10 +47,12 @@ import com.bumptech.glide.request.RequestOptions;
 import com.elmargomez.typer.Font;
 import com.elmargomez.typer.Typer;
 import com.example.ryan.db.Landmark;
+import com.example.ryan.db.LandmarkRate;
 import com.example.ryan.entity.LandmarkViewInfo;
 import com.example.ryan.entity.TuchongEntity;
 import com.example.ryan.utill.HttpUtill;
 import com.example.ryan.utill.ScreenUtil;
+import com.example.ryan.utill.StatusBarUtil;
 import com.example.ryan.utill.Utility;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.gson.Gson;
@@ -62,6 +68,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleBinaryOperator;
 
 
 import okhttp3.Call;
@@ -86,6 +93,7 @@ public class Landmark_DetailActivity extends AppCompatActivity {
 
 
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +114,10 @@ public class Landmark_DetailActivity extends AppCompatActivity {
                  findViewById(R.id.collapsing_toolbar);
         ImageView landmarkImageView = (ImageView) findViewById(R.id.landmark_image_view);
         TextView landmarkContext = (TextView) findViewById(R.id.landmark_context_text);
+        RatingBar ratingBar = findViewById(R.id.ratingbar);
+        TextView landmarkTime = findViewById(R.id.landmark_time_text);
+        final TextView rateTextView = findViewById(R.id.landmark_rate);
+        AppBarLayout appBarLayout = findViewById(R.id.appBar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if(actionBar!=null){
@@ -116,10 +128,28 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         collapsingToolbarLayout.setExpandedTitleTypeface(font);
         collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
         collapsingToolbarLayout.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
+        StatusBarUtil.setStatusBarColorForCollapsingToolbar(this,appBarLayout,collapsingToolbarLayout,toolbar,R.color.colorPrimary);
         Glide.with(this).load("https://devyn.wang/images/p"+ landmarkImageId +".jpg").apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)).into(landmarkImageView);
         final String landmarkContent = generateLandmarkContent(landmarkName);
         landmarkContext.setText(landmarkContent);
+        ratingBar.setRating((generateLandmarkRate(landmarkName)));
+        rateTextView.setText(String.valueOf((generateLandmarkRate(landmarkName))));
+        String string = generateLandmarkTime(landmarkName);
+        if(string.isEmpty()){
+            landmarkTime.setText("未获取到开放时间");
+        }else {
+            landmarkTime.setText("开放时间 : "+ generateLandmarkTime(landmarkName));
+        }
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                ContentValues values = new ContentValues();
+                values.put("rate", rating);
+                rateTextView.setText(String.valueOf(rating));
+                DataSupport.updateAll(LandmarkRate.class,values,"landmarkName=?",landmarkName);
+            }
+        });
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,7 +177,12 @@ public class Landmark_DetailActivity extends AppCompatActivity {
     }
     private String generateLandmarkContent(String landmarkName){
         return DataSupport.select("detail").where("landmarkName = ?",landmarkName).findFirst(Landmark.class).getDetail();
-
+    }
+    private float generateLandmarkRate(String landmarkName){
+        return DataSupport.select("rate").where("landmarkName = ?",landmarkName).findFirst(LandmarkRate.class).getRate();
+    }
+    private String generateLandmarkTime(String landmarkName){
+        return DataSupport.select("time").where("landmarkName = ?",landmarkName).findFirst(Landmark.class).getTime();
     }
 
 
@@ -278,6 +313,7 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         super.onStop();
         mBanner.stopAutoPlay();
     }
+
 
 
 

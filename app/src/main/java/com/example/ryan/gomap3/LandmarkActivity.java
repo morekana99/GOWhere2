@@ -59,7 +59,6 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-import static com.example.ryan.utill.StatusBarUtil.translucentStatusBar;
 
 /**
  * The type Landmark activity.
@@ -120,7 +119,7 @@ public class LandmarkActivity extends AppCompatActivity {
         editText = findViewById(R.id.toolbar_edit);
         fab = findViewById(R.id.trans_fab);
         recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setItemViewCacheSize(4);
+        recyclerView.setItemViewCacheSize(100);
         layoutManager = new GridLayoutManager(this, 2);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -188,34 +187,42 @@ public class LandmarkActivity extends AppCompatActivity {
         editor.putString(COUNTRY_NAME, countryName.getCountyName());
         editor.putInt(CITY_CODE, city);
         editor.apply();
-        Log.e("kana", "initData: "+ countryName.getCountyName());
+        Log.e("kana", "initData: "+ countryName.getCountyName()+"/"+country);
     }
     @Override
     public  boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.toolbar,menu);
-        MenuItem location = menu.findItem(R.id.location);
         return super.onCreateOptionsMenu(menu);
     }
     @SuppressLint("NonConstantResourceId")
     @Override
     public  boolean onOptionsItemSelected(MenuItem item){
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(LandmarkActivity.this).edit();
         switch (item.getItemId()){
-
             case R.id.location:
                 Intent myLocation = new Intent(LandmarkActivity.this,WebActivity.class);
                 String url= "https://uri.amap.com/search?keyword=&view=map&src=gowhere&coordinate=gaode&callnative=0";
                 myLocation.putExtra("landmark_url",url);
                 startActivity(myLocation);
-                break;
+                return true;
             case android.R.id.home:
                 mDrawLayout.openDrawer(GravityCompat.START);
-                break;
+                return true;
+            case R.id.single_menu_01:
+                editor.putInt("search_flag", 0);
+                editor.apply();
+                item.setChecked(true);
+                Toast.makeText(this, "已切换到："+item.getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.single_menu_02:
+                editor.putInt("search_flag", 1);
+                editor.apply();
+                item.setChecked(true);
+                Toast.makeText(this, "已切换到："+item.getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
             default:
-                throw new IllegalStateException("Unexpected value: " + item.getItemId());
+                return super.onOptionsItemSelected(item);
         }
-
-
-        return true;
     }
 
     /**
@@ -268,7 +275,6 @@ public class LandmarkActivity extends AppCompatActivity {
         }
     }
     private void queryLandmarks(){
-        initData();
         landmarkList = DataSupport.where("cityid = ?",String.valueOf(city)).find(Landmark.class);
         if(landmarkList.size() > 0) {
             int previousSize = dataList.size();

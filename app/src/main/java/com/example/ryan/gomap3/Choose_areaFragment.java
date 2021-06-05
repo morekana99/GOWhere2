@@ -44,6 +44,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static com.example.ryan.gomap3.LandmarkActivity.CITY_CODE;
 import static com.example.ryan.gomap3.LandmarkActivity.COUNTRY_ID;
 import static com.example.ryan.gomap3.LandmarkActivity.COUNTRY_NAME;
 
@@ -88,6 +89,7 @@ public class Choose_areaFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         StatusBarUtil.translucentStatusBar(getActivity(),true);
         initAutoCompareView();
+
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -98,6 +100,7 @@ public class Choose_areaFragment extends Fragment {
                 else if (currentLevel==LEVEL_CITY){
                     if(getActivity() instanceof  LaunchActivity) {
                         LandmarkActivity.actionStart(getActivity(),cityList.get(position).getCountryId(),cityList.get(position).getCityCode());
+                        saveData(cityList.get(position).getCountryId(),spCityId = cityList.get(position).getCityCode(),selectCountry.getCountyName());
                         getActivity().finish();
                     }
                     else if(getActivity() instanceof LandmarkActivity){
@@ -107,6 +110,7 @@ public class Choose_areaFragment extends Fragment {
                         spCountryName = selectCountry.getCountyName();
                         activity.initLandmarkList(spCountryId,spCityId);
                         activity.mDrawLayout.closeDrawers();
+                        saveData(spCountryId,spCityId,spCountryName);
                         Log.d("kana", "onCreate: "+spCityId+"/"+spCountryId+"/"+spCountryName);
                     }
                 }
@@ -120,17 +124,6 @@ public class Choose_areaFragment extends Fragment {
                 }
             }
         });
-        SharedPreferences prfs = PreferenceManager.getDefaultSharedPreferences( getActivity());
-        int cache = prfs.getInt(COUNTRY_ID,0);
-        String cacheName = prfs.getString(COUNTRY_NAME,"");
-        if (cache != 0) {
-            selectCountry.setCountryCode(cache);
-            selectCountry.setCountyName(cacheName);
-            queryCities();
-        }else {
-            queryCountries();
-        }
-
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
 
             @Override
@@ -148,6 +141,17 @@ public class Choose_areaFragment extends Fragment {
                 }
             }
         });
+        SharedPreferences prfs = PreferenceManager.getDefaultSharedPreferences( getActivity());
+        int cache = prfs.getInt(COUNTRY_ID,0);
+        String cacheName = prfs.getString(COUNTRY_NAME,"");
+        Log.e("kana", "SharedPreferences: "+cache+"/"+cacheName);
+        if (cache != 0) {
+            selectCountry.setCountryCode(cache);
+            selectCountry.setCountyName(cacheName);
+            queryCities();
+        }else {
+            queryCountries();
+        }
     }
 
     private void queryCountries(){
@@ -188,7 +192,6 @@ public class Choose_areaFragment extends Fragment {
     }
 
     private void queryFromServer(String address, final String type){
-        Log.e("Choose_areaFragment","7");
         HttpUtill.sendOkHttpRequest(address, new Callback() {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
@@ -273,7 +276,14 @@ public class Choose_areaFragment extends Fragment {
             autoCompleteTextView.setText("");
         }
 
-    }
 
+    }
+    public void saveData(int countryId,int cityCode,String countryName){
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+        editor.putInt(COUNTRY_ID, countryId);
+        editor.putInt(CITY_CODE,cityCode);
+        editor.putString(COUNTRY_NAME, countryName);
+        editor.apply();
+    }
 }
 

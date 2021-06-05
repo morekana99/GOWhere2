@@ -24,8 +24,8 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="/private/var/folders/6x/z0hhpn_566b41b7mhrzg90xc0000gn/T/baseline_cancel_24.xml" />
-                                                <entry key="opacityPercent" value="60" />
+                                                <entry key="imagePath" value="/private/var/folders/6x/z0hhpn_566b41b7mhrzg90xc0000gn/T/baseline_access_time_24.xml" />
+                                                <entry key="opacityPercent" value="80" />
                                                 <entry key="paddingPercent" value="5" />
                                               </map>
                                             </option>
@@ -37,7 +37,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material/icons/materialicons/cancel/baseline_cancel_24.xml" />
+                                                <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material/icons/materialicons/access_time/baseline_access_time_24.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -83,8 +83,9 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_delete_gray" />
-                                      <entry key="themeColor" value="95a1aa" />
+                                      <entry key="outputName" value="ic_landmark_time" />
+                                      <entry key="theme" value="CUSTOM" />
+                                      <entry key="themeColor" value="3662e6" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -338,6 +339,11 @@
                                 </PersistentState>
                               </value>
                             </entry>
+                          </map>
+                        </option>
+                        <option name="values">
+                          <map>
+                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>

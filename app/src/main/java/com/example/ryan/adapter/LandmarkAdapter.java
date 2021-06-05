@@ -81,7 +81,7 @@ public class LandmarkAdapter extends RecyclerView.Adapter<LandmarkAdapter.ViewHo
         Glide.with(mContext)
                 .load("https://devyn.wang/images/p"+landmark.getImageId()+".jpg")
                 .apply(new RequestOptions()
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                         .placeholder(R.drawable.default_image)
                         .error(R.drawable.default_image)
                         .fitCenter())
@@ -92,6 +92,7 @@ public class LandmarkAdapter extends RecyclerView.Adapter<LandmarkAdapter.ViewHo
     public int getItemCount(){
         return mLandmarkList.size();
     }
+
 
 
 

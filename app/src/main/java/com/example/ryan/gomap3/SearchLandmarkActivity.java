@@ -46,11 +46,13 @@ import static com.example.ryan.gomap3.LandmarkActivity.CITY_CODE;
  * @author devonwong
  */
 public class SearchLandmarkActivity extends BaseActivity {
+
     private RecyclerViewWithContextMenu recyclerView;
     private QuickAdapter mAdapter;
     private List<String> dataList;
     private AutoCompleteTextView autoCompleteTextView;
     private int cityCode;
+    private int searchFlag;
 
 
     @Override
@@ -131,6 +133,7 @@ public class SearchLandmarkActivity extends BaseActivity {
     private void initData() {
         SharedPreferences prfs = PreferenceManager.getDefaultSharedPreferences(this);
         cityCode = prfs.getInt(CITY_CODE,0);
+        this.searchFlag = prfs.getInt("search_flag",0);
 
     }
 
@@ -203,22 +206,29 @@ public class SearchLandmarkActivity extends BaseActivity {
     @NonNull
     private List<String> createDataList(){
         List<String> list=new ArrayList<>();
-
-        //全局搜索
-        //List<SearchHistory> searchHistoryList = DataSupport.select("name").order("id desc").find(SearchHistory.class);
         List<SearchHistory> searchHistoryList = DataSupport
                 .select("name")
                 .where("cityCode=?",String.valueOf(cityCode))
                 .order("id desc")
                 .find(SearchHistory.class);
-
         for(SearchHistory i:searchHistoryList){
             list.add(i.getName());
         }
         return list;
     }
     public boolean actionSearch(String landmarkName){
-        Landmark landmark = DataSupport.select("landmarkName","cityName","countryId","imageId").where("landmarkName=?",landmarkName).findFirst(Landmark.class);
+        Landmark landmark = null;
+        if (searchFlag==0){
+            landmark = DataSupport
+                    .select("landmarkName","cityName","countryId","imageId")
+                    .where("landmarkName=?","cityId=?", landmarkName,String.valueOf(cityCode))
+                    .findFirst(Landmark.class);
+        }else if(searchFlag==1){
+            landmark = DataSupport
+                    .select("landmarkName", "cityName", "countryId", "imageId")
+                    .where("landmarkName=?",landmarkName)
+                    .findFirst(Landmark.class);
+        }
         if(landmark==null){
             Toast.makeText(SearchLandmarkActivity.this,"未查询到该景点:"+ landmarkName, Toast.LENGTH_SHORT).show();
             return false;
@@ -250,9 +260,18 @@ public class SearchLandmarkActivity extends BaseActivity {
 
     public ArrayList<String> createSuggestList(){
         ArrayList<String> list=new ArrayList<>();
-        List<Landmark> landmarkList = DataSupport.select("landmarkName")
-                .where("cityId=?",String.valueOf(cityCode))
-                .find(Landmark.class);
+        List<Landmark> landmarkList = null;
+        if(searchFlag==0) {
+            landmarkList = DataSupport
+                    .select("landmarkName")
+                    .where("cityId=?", String.valueOf(cityCode))
+                    .find(Landmark.class);
+        }else if(searchFlag==1){
+            landmarkList = DataSupport
+                    .select("landmarkName")
+                    .find(Landmark.class);
+        }
+
         for(Landmark i:landmarkList){
             list.add(i.getLandmarkName());
         }

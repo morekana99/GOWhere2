@@ -15,11 +15,14 @@ public class Landmark extends DataSupport {
     private int countryId;
     private int cityId;
     private int imageId;
+    private float rate;
+    private String time;
     private String detail;
 
     public int getImageId(){
         return imageId;
     }
+
     public void setImageId(int imageId){
         this.imageId = imageId;
     }
@@ -31,7 +34,6 @@ public class Landmark extends DataSupport {
     public int getId() {
         return id;
     }
-
 
     public int getCityId() {
         return cityId;
@@ -65,6 +67,22 @@ public class Landmark extends DataSupport {
         this.cityName = cityName;
     }
 
+    public float getRate() {
+        return rate;
+    }
+
+    public void setRate(float rate) {
+        this.rate = rate;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
     public String getDetail() {
         return detail;
     }
@@ -79,6 +97,8 @@ public class Landmark extends DataSupport {
                 "cityName='" + cityName + '\'' +
                 "landmarkName='" + landmarkName + '\'' +
                 ", imageId='" + imageId + '\'' +
+                ", rate=" + rate +
+                ", time=" + time +
                 ", detail=" + detail +
                 '}';
     }

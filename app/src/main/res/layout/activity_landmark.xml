@@ -15,25 +15,28 @@
             android:id="@+id/swipe"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorBackground"
+            android:background="@drawable/bg2"
             app:srlPrimaryColor="@color/colorPrimary"
             app:srlAccentColor="@android:color/white"
             app:srlEnableHeaderTranslationContent="true"
             app:srlEnableLoadMore="true"
             app:srlEnableAutoLoadMore="false"
-            app:srlEnablePreviewInEditMode="true"
-            android:paddingTop="@dimen/toolbar_height">
+            app:srlEnablePreviewInEditMode="true">
             <com.scwang.smartrefresh.header.PhoenixHeader
                 android:id="@+id/header"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="@dimen/toolbar_height"/>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:overScrollMode="never"/>
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingTop="@dimen/toolbar_height"
+                    android:clipToPadding="false"
+                    android:overScrollMode="never"/>
+
+
             <com.scwang.smartrefresh.header.TaurusHeader
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
@@ -50,8 +53,8 @@
                 android:layout_height="?attr/actionBarSize"
                 android:background="@android:color/transparent"
                 android:paddingLeft="10dp"
-                android:theme="@style/MyMenu"
                 android:layout_marginTop="35dp"
+                android:theme="@style/MyMenu"
                 app:layout_collapseMode="parallax"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:titleTextColor="#FFFFFF">

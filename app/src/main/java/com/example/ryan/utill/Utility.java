@@ -2,10 +2,12 @@ package com.example.ryan.utill;
 
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.ryan.db.City;
 import com.example.ryan.db.Country;
 import com.example.ryan.db.Landmark;
+import com.example.ryan.db.LandmarkRate;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -62,16 +64,20 @@ public class  Utility {
             List<Landmark> gsonLandmarkList = new Gson().fromJson(response, new TypeToken<List<Landmark>>(){}.getType());
             for (Landmark mLandmark :gsonLandmarkList) {
                 Landmark landmark = new Landmark();
+                LandmarkRate landmarkRate  = new LandmarkRate();
                 landmark.setLandmarkName(mLandmark.getLandmarkName());
                 landmark.setCityId(cityId);
                 landmark.setCountryId(mLandmark.getCountryId());
                 landmark.setImageId(mLandmark.getImageId());
                 landmark.setCityName(mLandmark.getCityName());
+                landmarkRate.setLandmarkName(mLandmark.getLandmarkName());
+                landmarkRate.setRate(mLandmark.getRate()!=0.0f?mLandmark.getRate():0.0f);
+                landmark.setTime(mLandmark.getTime()!=null?mLandmark.getTime():"");
                 landmark.setDetail(mLandmark.getDetail()!=null?mLandmark.getDetail():"很抱歉，该景点暂无简介信息，工程师正在抓紧完善");
                 landmark.save();
+                landmarkRate.save();
             }
             return true;
-
         }
         return false;
     }

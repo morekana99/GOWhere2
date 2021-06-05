@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:color="http://schemas.android.com/apk/res-auto">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -31,7 +31,7 @@
     <style name="MyMenu" parent="Widget.AppCompat.Light.PopupMenu.Overflow">
         <item name="overlapAnchor">false</item>
         <item name="colorControlNormal">#FFFFFF</item>
-
+        <item name="colorControlActivated">@color/colorPrimary</item>
     </style>
 
     <style name="edit_AlertDialog_style" parent="@android:style/Theme.Dialog">
