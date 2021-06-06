@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.ryan.bean.UrlBean;
 import com.example.ryan.view.BorderTextView;
 import com.example.ryan.utill.ImageUtils;
 import com.example.ryan.utill.SwListDialog;
@@ -46,6 +47,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static com.example.ryan.gomap3.ImageActivity.URL_EXTRA;
+
 /**
  * Created by baijing on 2017/7/3.
  */
@@ -57,6 +60,7 @@ public class OcrTranslateActivity extends Activity {
     private TextView original;
     private Uri currentUri;
     private String filePath;
+    private ImageView backView;
     private ImageView imageView;
     private ImageView resultImage;
     private BorderTextView borderTextView;
@@ -64,6 +68,8 @@ public class OcrTranslateActivity extends Activity {
 
     private TextView languageSelectFrom;
     private TextView languageSelectTo;
+
+    byte[] imageByteArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +91,26 @@ public class OcrTranslateActivity extends Activity {
                 selectLanguage(languageSelectTo);
             }
         });
+        backView = findViewById(R.id.login_reback_btn);
+        backView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         imageView = (ImageView) findViewById(R.id.imageView);
         resultImage = (ImageView)findViewById(R.id.resultImageView);
+        resultImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UrlBean urlBean = new UrlBean(imageByteArray);
+                Bundle bundle =new Bundle();
+                bundle.putParcelable(URL_EXTRA,urlBean);
+                ImageActivity.actionStart(OcrTranslateActivity.this,bundle);
+            }
+        });
         original = (TextView) findViewById(R.id.original);
         borderTextView = (BorderTextView) findViewById(R.id.resultText);
-
     }
 
     OcrTranslateListener translateListener = new OcrTranslateListener() {
@@ -127,7 +148,7 @@ public class OcrTranslateActivity extends Activity {
                             break;
                         }
                     }
-                    byte[] imageByteArray = Base64.decode(result.getRenderImage(), Base64.DEFAULT);
+                    imageByteArray = Base64.decode(result.getRenderImage(), Base64.DEFAULT);
                     imageView.setVisibility(View.VISIBLE);
                     Glide.with(OcrTranslateActivity.this).load(imageByteArray).into(resultImage);
                     borderTextView.setVisibility(View.VISIBLE);

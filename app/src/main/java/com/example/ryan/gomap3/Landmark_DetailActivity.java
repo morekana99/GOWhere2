@@ -1,18 +1,13 @@
 package com.example.ryan.gomap3;
 
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
@@ -25,55 +20,45 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.blankj.utilcode.util.LogUtils;
-import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.elmargomez.typer.Font;
 import com.elmargomez.typer.Typer;
+import com.example.ryan.bean.UrlBean;
 import com.example.ryan.db.Landmark;
 import com.example.ryan.db.LandmarkRate;
-import com.example.ryan.entity.LandmarkViewInfo;
-import com.example.ryan.entity.TuchongEntity;
+import com.example.ryan.bean.LandmarkViewInfo;
 import com.example.ryan.utill.HttpUtill;
 import com.example.ryan.utill.ScreenUtil;
 import com.example.ryan.utill.StatusBarUtil;
 import com.example.ryan.utill.Utility;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.google.gson.Gson;
 import com.stx.xhb.xbanner.XBanner;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 
 
 import org.litepal.crud.DataSupport;
 
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.DoubleBinaryOperator;
 
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+
+import static com.example.ryan.gomap3.ImageActivity.URL_EXTRA;
 
 
 /**
@@ -213,10 +198,10 @@ public class Landmark_DetailActivity extends AppCompatActivity {
         banner.setOnItemClickListener(new XBanner.OnItemClickListener() {
             @Override
             public void onItemClick(XBanner banner, Object model, View view, int position) {
-                Intent intent = new Intent(Landmark_DetailActivity.this,ImageActivity.class);
                 String url = ((LandmarkViewInfo)model).getXBannerUrl().toString();
-                intent.putExtra("url",url);
-                startActivity(intent);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(URL_EXTRA ,new UrlBean(url));
+                ImageActivity.actionStart(Landmark_DetailActivity.this,bundle);
             }
         });
         //加载广告图片

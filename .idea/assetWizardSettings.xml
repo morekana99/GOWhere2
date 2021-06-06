@@ -114,8 +114,8 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="$PROJECT_DIR$/../../R4267a361b34b21b99231c6e6d5ce941c.jpeg" />
-                                                <entry key="scalingPercent" value="69" />
+                                                <entry key="imagePath" value="$USER_HOME$/Desktop/icon.png" />
+                                                <entry key="scalingPercent" value="64" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -147,6 +147,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
+                                      <entry key="backgroundAssetType" value="COLOR" />
+                                      <entry key="backgroundColor" value="ffffff" />
                                       <entry key="outputName" value="ic_launcher_gowhere" />
                                     </map>
                                   </option>
@@ -339,11 +341,6 @@
                                 </PersistentState>
                               </value>
                             </entry>
-                          </map>
-                        </option>
-                        <option name="values">
-                          <map>
-                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>

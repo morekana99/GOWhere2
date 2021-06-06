@@ -16,7 +16,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
-import com.example.ryan.entity.LandmarkList;
+import com.example.ryan.bean.LandmarkList;
 import com.example.ryan.gomap3.Landmark_DetailActivity;
 import com.example.ryan.gomap3.R;
 

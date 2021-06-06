@@ -1,4 +1,4 @@
-package com.example.ryan.entity;
+package com.example.ryan.bean;
 
 /**
  * @author: xiaohaibin.
