@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#b93fb5ab</color>
-    <color name="colorPrimaryDark">#303f9f</color>
-    <color name="colorAccent">#ff4081</color>
-    <color name="theme">#FF4081</color>
+    <color name="colorPrimary">#1f6deb</color>
+    <color name="colorPrimaryDark">#1f6deb</color>
+    <color name="colorPrimaryAlpha">#E61F6DEB</color>
+    <color name="colorAccent">#ff4e49</color>
+    <color name="colorBackground">#f6f6f6</color>
+    <color name="transparent">@android:color/transparent</color>
+
+    <color name="theme">#1994d0</color>
+    <color name="chat">#559fca</color>
+    <color name="quote">#f0983c</color>
+    <color name="link">#5abb8b</color>
+    <color name="audio">#a67fc0</color>
+    <color name="photo">#d75f45</color>
+    <color name="text">#444444</color>
+    <color name="video">#748089</color>
+
+    <color name="fab">#529ecc</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="text_color">#949ca8</color>
+
+    <color name="bg_item">#fff</color>
+    <color name="bg_item_press">#f0f0f0</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="light_blue_900">#FF01579B</color>
+    <color name="light_blue_A200">#FF40C4FF</color>
+    <color name="light_blue_A400">#FF00B0FF</color>
+    <color name="black_overlay">#66000000</color>
 </resources>

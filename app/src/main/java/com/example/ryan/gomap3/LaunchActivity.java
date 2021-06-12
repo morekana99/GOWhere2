@@ -10,7 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 
-
+import static com.example.ryan.gomap3.LandmarkActivity.CITY_CODE;
+import static com.example.ryan.gomap3.LandmarkActivity.COUNTRY_ID;
 
 
 public class LaunchActivity extends AppCompatActivity {
@@ -48,8 +49,10 @@ public class LaunchActivity extends AppCompatActivity {
             }, 100);
         }
         SharedPreferences prfs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prfs.getString("cityname", null) != null) {
-            Intent intent = new Intent(this, WebActivity.class);
+        if (prfs.getInt(CITY_CODE, 0) != 0) {
+            Intent intent = new Intent(this, LandmarkActivity.class);
+            intent.putExtra(COUNTRY_ID, prfs.getInt(COUNTRY_ID, 0));
+            intent.putExtra(CITY_CODE, prfs.getInt(CITY_CODE, 0));
             startActivity(intent);
             finish();
         }

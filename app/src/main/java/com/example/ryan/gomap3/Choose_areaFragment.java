@@ -1,29 +1,37 @@
 package com.example.ryan.gomap3;
 
 import android.annotation.TargetApi;
-import android.app.Fragment;
+
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.ryan.adapter.AutoCompleteAdapter;
 import com.example.ryan.db.City;
 import com.example.ryan.db.Country;
 import com.example.ryan.db.Landmark;
 import com.example.ryan.utill.HttpUtill;
+import com.example.ryan.utill.StatusBarUtil;
 import com.example.ryan.utill.Utility;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshLoadMoreListener;
 
 
 import org.litepal.crud.DataSupport;
@@ -36,33 +44,42 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static com.example.ryan.gomap3.LandmarkActivity.CITY_CODE;
+import static com.example.ryan.gomap3.LandmarkActivity.COUNTRY_ID;
+import static com.example.ryan.gomap3.LandmarkActivity.COUNTRY_NAME;
+
+/**
+ * @author devonwong
+ */
 public class Choose_areaFragment extends Fragment {
-    public static final String TAG = "PPwwwwwwwwwwwwww";
     public static final int LEVEL_COUNTRY = 0;
     public static final int LEVEL_CITY = 1;
-    public static final int LEVEL_LANDMARK = 2;
-    private ProgressDialog progressDialog;
-    private TextView titilText;
+
+
     private Button backBotton;
     private ListView listview;
     private ArrayAdapter<String> adapter;
-    private List<String>dataList = new ArrayList<>();
+    private ArrayList<String>dataList = new ArrayList<>();
     private List<Country> countryList;
     private List<City> cityList;
     private List<Landmark> landmarkList;
-    private Country selectCountry;
-    private City selectCity;
-    private Landmark selectLandmark;
+    private Country selectCountry = new Country();
+    private int spCountryId = 0;
+    private int spCityId = 0;
+    private String spCountryName = "";
     private  int currentLevel;
+    private AutoCompleteTextView autoCompleteTextView;
+    private RefreshLayout refreshLayout;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle saveInstanceState) {
         View view = inflater.inflate(R.layout.choose_area, container, false);
-        titilText = (TextView) view.findViewById(R.id.title_text);
         backBotton = (Button) view.findViewById(R.id.back_button);
         listview = (ListView) view.findViewById(R.id.list_view);
+        autoCompleteTextView = (AutoCompleteTextView)view.findViewById(R.id.title_text);
+        refreshLayout = view.findViewById(R.id.area_refresh);
         adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, dataList);
         listview.setAdapter(adapter);
         return view;
@@ -70,6 +87,9 @@ public class Choose_areaFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
+        StatusBarUtil.translucentStatusBar(getActivity(),true);
+        initAutoCompareView();
+
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -78,21 +98,20 @@ public class Choose_areaFragment extends Fragment {
                     queryCities();
                 }
                 else if (currentLevel==LEVEL_CITY){
-                    String cityName=cityList.get(position).getCityName();
-                    Toast.makeText(getActivity(),cityName,Toast.LENGTH_SHORT).show();
                     if(getActivity() instanceof  LaunchActivity) {
-                        Intent intent = new Intent(getActivity(), LandmarkActivity.class);
-                        intent.putExtra("countrycode", cityList.get(position).getCountryId());
-                        intent.putExtra("citycode", cityList.get(position).getCityCode());
-                        Log.d(TAG, cityList.get(position).getCountryId()+","+cityList.get(position).getCityCode());
-                        startActivity(intent);
+                        LandmarkActivity.actionStart(getActivity(),cityList.get(position).getCountryId(),cityList.get(position).getCityCode());
+                        saveData(cityList.get(position).getCountryId(),spCityId = cityList.get(position).getCityCode(),selectCountry.getCountyName());
                         getActivity().finish();
-
                     }
                     else if(getActivity() instanceof LandmarkActivity){
                         LandmarkActivity activity = (LandmarkActivity)getActivity();
+                        spCityId = cityList.get(position).getCityCode();
+                        spCountryId = cityList.get(position).getCountryId();
+                        spCountryName = selectCountry.getCountyName();
+                        activity.initLandmarkList(spCountryId,spCityId);
                         activity.mDrawLayout.closeDrawers();
-                        activity.initLandmark(cityList.get(position).getCountryId(),cityList.get(position).getCityCode());
+                        saveData(spCountryId,spCityId,spCountryName);
+                        Log.d("kana", "onCreate: "+spCityId+"/"+spCountryId+"/"+spCountryName);
                     }
                 }
             }
@@ -105,13 +124,40 @@ public class Choose_areaFragment extends Fragment {
                 }
             }
         });
-        queryCountries();
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                if(currentLevel==LEVEL_COUNTRY){
+                    DataSupport.deleteAll(Country.class);
+                    queryCountries();
+                    refreshLayout.finishRefresh(2000/*,false*/);//传入false表示刷新失败
+                }else if(currentLevel==LEVEL_CITY){
+                    DataSupport.deleteAll(City.class);
+                    queryCities();
+                    refreshLayout.finishRefresh(2000/*,false*/);//传入false表示刷新失败
+                }else{
+                    refreshLayout.finishRefresh(false);//传入false表示刷新失败
+                }
+            }
+        });
+        SharedPreferences prfs = PreferenceManager.getDefaultSharedPreferences( getActivity());
+        int cache = prfs.getInt(COUNTRY_ID,0);
+        String cacheName = prfs.getString(COUNTRY_NAME,"");
+        Log.e("kana", "SharedPreferences: "+cache+"/"+cacheName);
+        if (cache != 0) {
+            selectCountry.setCountryCode(cache);
+            selectCountry.setCountyName(cacheName);
+            queryCities();
+        }else {
+            queryCountries();
+        }
     }
 
     private void queryCountries(){
-        titilText.setText("选择国家");
+        autoCompleteTextView.setHint("搜索国家");
         backBotton.setVisibility(View.GONE);
-        countryList = DataSupport.findAll(Country.class);
+        countryList = DataSupport.select("countryCode","countyName").order("countryCode").find(Country.class);
         if(countryList.size() > 0){
             dataList.clear();
             for(Country country : countryList){
@@ -121,14 +167,15 @@ public class Choose_areaFragment extends Fragment {
             listview.setSelection(0);
             currentLevel = LEVEL_COUNTRY;
         }else {
-            String address = "http://192.168.3.59:8080/landmark/";
+            String address = HttpUtill.oneIP;
             queryFromServer(address,"country");
         }
+
     }
     private void queryCities(){
-        titilText.setText(selectCountry.getCountyName());
+        autoCompleteTextView.setHint("在"+selectCountry.getCountyName()+"内搜索");
         backBotton.setVisibility(View.VISIBLE);
-        cityList = DataSupport.where("countryid = ?", String.valueOf(selectCountry.getId())).find(City.class);
+        cityList = DataSupport.where("countryId = ?", selectCountry.getCountryCode()+"").order("cityCode").find(City.class);
         if(cityList.size() > 0){
             dataList.clear();
             for(City city : cityList){
@@ -139,32 +186,12 @@ public class Choose_areaFragment extends Fragment {
             currentLevel = LEVEL_CITY;
         }else{
             int countryCode= selectCountry.getCountryCode();
-            String address = "http://192.168.3.59:8080/landmark/" + countryCode;
+            String address = HttpUtill.oneIP + countryCode;
             queryFromServer(address,"city");
         }
     }
-    private void queryLandmarks(){
-        titilText.setText(selectCity.getCityName());
-        backBotton.setVisibility(View.VISIBLE);
-        landmarkList = DataSupport.where("cityid = ?",String.valueOf(selectCity.getId())).find(Landmark.class);
-        if(landmarkList.size() > 0) {
-            dataList.clear();
-            for (Landmark landmark : landmarkList) {
-                dataList.add(landmark.getLandmarkName());
-            }
-            adapter.notifyDataSetChanged();
-            listview.setSelection(0);
-            currentLevel = LEVEL_LANDMARK;
-        }else{
-            int countryCode = selectCountry.getCountryCode();
-            int cityCode = selectCity.getCityCode();
-            String address = "http://uitlearn.top/api/country/" +  countryCode+ "/" + cityCode+".json";
-            queryFromServer(address,"landmark");
-        }
-    }
+
     private void queryFromServer(String address, final String type){
-        showProgressDialog();
-        Log.e("Choose_areaFragment","7");
         HttpUtill.sendOkHttpRequest(address, new Callback() {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
@@ -173,16 +200,12 @@ public class Choose_areaFragment extends Fragment {
                 if("country".equals(type)){
                     result = Utility.handleCountryResponse(responseText);
                 } else if("city".equals(type)){
-                    result = Utility.handleCityResponse(responseText,selectCountry.getId());
-                }
-                else if("landmark".equals(type)){
-                    result = Utility.handleLandmarkResponse(responseText,selectCity.getId());
+                    result = Utility.handleCityResponse(responseText,selectCountry.getCountryCode());
                 }
                 if (result){
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            closeProgressDialog();
                             if("country".equals(type)){
                                 queryCountries();
                             }
@@ -201,32 +224,66 @@ public class Choose_areaFragment extends Fragment {
                     @TargetApi(Build.VERSION_CODES.M)
                     @Override
                     public void run() {
-                        closeProgressDialog();
                         Toast.makeText(getContext(),"无网络连接，请检查网络",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
     }
-    /**
-     * 显示Loading框
-     */
-    private void showProgressDialog(){
-        if(progressDialog == null){
-            progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage("正在加载...");
-            progressDialog.setCanceledOnTouchOutside(false);
-        }
-        progressDialog.show();
-    }
-    /**
-     *关闭进度框
-     */
-    private void closeProgressDialog(){
-        if (progressDialog != null){
-            progressDialog.dismiss();
-        }
+    public void initAutoCompareView() {
+        AutoCompleteAdapter autoCompleteAdapter = new AutoCompleteAdapter(getActivity(), dataList);
+        autoCompleteTextView.setAdapter(autoCompleteAdapter);
+        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(currentLevel==LEVEL_CITY){
+                    actionSearchCity(parent.getItemAtPosition(position).toString());
+                }else if(currentLevel==LEVEL_COUNTRY){
+                    selectCountry=DataSupport.where("countyName=?",parent.getItemAtPosition(position).toString()).findFirst(Country.class);
+                    queryCities();
+                    autoCompleteTextView.setText("");
+                }
+
+            }
+        });
+
     }
 
+    public void actionSearchCity(String cityName) {
+        City city = DataSupport.select("countryId","cityCode").where("cityName=?",cityName).findFirst(City.class);
+        if(city==null){
+            Toast.makeText(getActivity(),"未查询到该城市:"+ cityName, Toast.LENGTH_SHORT).show();
+        }else{
+            if(getActivity() instanceof  LaunchActivity) {
+                LandmarkActivity.actionStart(
+                        getActivity() ,
+                        city.getCountryId(),
+                        city.getCityCode()
+                );
+
+            }
+            else if(getActivity() instanceof LandmarkActivity){
+                LandmarkActivity activity = (LandmarkActivity)getActivity();
+                activity.mDrawLayout.closeDrawers();
+                activity.initLandmarkList(city.getCountryId(),city.getCityCode());
+            }
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if(imm.isActive()&&getActivity().getCurrentFocus()!=null){
+                if (getActivity().getCurrentFocus().getWindowToken()!=null) {
+                    imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                }
+            }
+            autoCompleteTextView.setText("");
+        }
+
+
+    }
+    public void saveData(int countryId,int cityCode,String countryName){
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+        editor.putInt(COUNTRY_ID, countryId);
+        editor.putInt(CITY_CODE,cityCode);
+        editor.putString(COUNTRY_NAME, countryName);
+        editor.apply();
+    }
 }
 

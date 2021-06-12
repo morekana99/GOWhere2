@@ -5,5 +5,7 @@
         <mapping class="com.example.ryan.db.Country"/>
         <mapping class="com.example.ryan.db.City"/>
         <mapping class="com.example.ryan.db.Landmark"/>
+        <mapping class="com.example.ryan.db.LandmarkRate"/>
+        <mapping class="com.example.ryan.db.SearchHistory"/>
     </list>
 </litepal>

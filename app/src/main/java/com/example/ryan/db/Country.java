@@ -2,6 +2,9 @@ package com.example.ryan.db;
 
 import org.litepal.crud.DataSupport;
 
+/**
+ * @author devonwong
+ */
 public class Country extends DataSupport {
     private int id;
     private  String countyName;
