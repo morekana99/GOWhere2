@@ -221,7 +221,7 @@ public class SearchLandmarkActivity extends BaseActivity {
         if (searchFlag==0){
             landmark = DataSupport
                     .select("landmarkName","cityName","countryId","imageId")
-                    .where("landmarkName=?","cityId=?", landmarkName,String.valueOf(cityCode))
+                    .where("landmarkName=? and cityId=?", landmarkName,String.valueOf(cityCode))
                     .findFirst(Landmark.class);
         }else if(searchFlag==1){
             landmark = DataSupport
