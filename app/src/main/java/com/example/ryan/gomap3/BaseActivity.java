@@ -10,6 +10,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 
+/**
+ * @author devonwong
+ */
 public class BaseActivity extends AppCompatActivity {
 
     private static final String TAG = "BaseActivity";
