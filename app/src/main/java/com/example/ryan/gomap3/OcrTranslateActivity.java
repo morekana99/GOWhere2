@@ -49,10 +49,10 @@ import java.util.List;
 
 import static com.example.ryan.gomap3.ImageActivity.URL_EXTRA;
 
-/**
- * Created by baijing on 2017/7/3.
- */
 
+/**
+ * @author devonwong
+ */
 public class OcrTranslateActivity extends Activity {
 
     private String[] lang = new String[]{"中文", "日文", "英文","法文","西班牙文","葡萄牙文","俄文","德文"};
