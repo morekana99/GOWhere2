@@ -22,6 +22,9 @@ import com.example.ryan.gomap3.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author devonwong
+ */
 public final class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ItemViewHolder> {
     private static final int VIEW_TYPE_HEADER_VIEW      = 100;
     private static final int VIEW_TYPE_CONTENT_VIEW     = 200;
