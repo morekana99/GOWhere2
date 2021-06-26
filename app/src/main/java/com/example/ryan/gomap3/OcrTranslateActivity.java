@@ -51,7 +51,7 @@ import static com.example.ryan.gomap3.ImageActivity.URL_EXTRA;
 
 
 /**
- * @author devonwong
+ * @author devonwong on 6/26/2021
  */
 public class OcrTranslateActivity extends Activity {
 
